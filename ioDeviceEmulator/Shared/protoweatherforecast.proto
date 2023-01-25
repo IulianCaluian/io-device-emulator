@@ -8,7 +8,11 @@ option csharp_namespace = "ioDeviceEmulator.Shared";
 package ProtoWeatherForecast;
 
 service ProtoWeatherForecastService {
-  rpc GetProtoWeatherForecast (google.protobuf.Empty) returns (ProtoWeatherForecastResponse);
+
+	rpc GetProtoWeatherForecast (google.protobuf.Empty) returns (ProtoWeatherForecastResponse);
+
+	rpc GetProtoStreamWeatherFrocast (google.protobuf.Empty) returns (stream ProtoWeatherForecast);
+
 }
 
 message ProtoWeatherForecastResponse {

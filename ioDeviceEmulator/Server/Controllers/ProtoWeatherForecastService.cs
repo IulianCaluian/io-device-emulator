@@ -22,6 +22,26 @@ namespace ioDeviceEmulator.Server.Controllers
             return Task.FromResult<ProtoWeatherForecastResponse>(response);
         }
 
+        public override async Task GetProtoStreamWeatherFrocast(Empty request, IServerStreamWriter<ProtoWeatherForecast> responseStream, ServerCallContext context)
+        {
+            for (int i = 0; i < 60; i++)
+            {
+                await Task.Delay(1000);
+
+                var rng = new Random();
+                var randomForcast = new ProtoWeatherForecast
+                {
+                    Date = DateTime.Now.AddDays(i),
+                    TemperatureC = rng.Next(-20, 55),
+                    Summary = Summaries[rng.Next(Summaries.Length)]
+                };
+
+                responseStream.WriteAsync(randomForcast);
+
+            }
+     
+        }
+
         public IEnumerable<ProtoWeatherForecast> GetWeatherForecast()
         {
             var rng = new Random();
