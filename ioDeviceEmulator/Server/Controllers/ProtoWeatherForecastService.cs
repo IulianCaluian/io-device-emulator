@@ -36,7 +36,7 @@ namespace ioDeviceEmulator.Server.Controllers
                     Summary = Summaries[rng.Next(Summaries.Length)]
                 };
 
-                responseStream.WriteAsync(randomForcast);
+                await responseStream.WriteAsync(randomForcast);
 
             }
      

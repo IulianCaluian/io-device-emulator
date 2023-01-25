@@ -1,0 +1,94 @@
+﻿@page "/fetchdatagrpcstream"
+@inject ProtoWeatherForecastService.ProtoWeatherForecastServiceClient WeatherForecastServiceClient
+
+@using Google.Protobuf.WellKnownTypes
+@using Grpc.Core
+@using ioDeviceEmulator.Shared;
+
+@implements IDisposable
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from the gRPC service.</p>
+
+@if (forecasts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Temp. (C)</th>
+                <th>Temp. (F)</th>
+                <th>Summary</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var forecast in forecasts)
+            {
+                <tr>
+                    <td>@forecast.Date.ToShortDateString()</td>
+                    <td>@forecast.TemperatureC</td>
+                    <td>@forecast.TemperatureF</td>
+                    <td>@forecast.Summary</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+
+    private IList<ProtoWeatherForecast> forecasts;
+    private AsyncServerStreamingCall<ProtoWeatherForecast> stream;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // forecasts = (await WeatherForecastServiceClient.GetProtoWeatherForecastAsync(new Empty())).Forecasts;
+
+        forecasts = new  List<ProtoWeatherForecast>();
+
+        Console.WriteLine("start");
+        stream = WeatherForecastServiceClient.GetProtoStreamWeatherFrocast(new Empty());
+        Console.WriteLine("lisening");
+
+        var task = Task.Run( async() =>
+        {
+            Console.WriteLine("waite");
+            while (await stream.ResponseStream.MoveNext())
+            {
+                try
+                {
+                    Console.WriteLine("get new data");
+                    var forecast = stream.ResponseStream.Current;
+                    forecasts.Add(forecast);
+
+                    await InvokeAsync(() => { this.StateHasChanged(); });
+                    Console.WriteLine("lisening");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+            Console.WriteLine("done");
+        });
+
+
+
+    }
+
+    public void Dispose()
+    {
+        stream.Dispose();
+        Console.WriteLine("stream disposed.");
+    }
+
+
+
+  
+
+}

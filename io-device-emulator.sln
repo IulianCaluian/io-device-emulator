@@ -5,11 +5,11 @@ VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ioDeviceEmulatorGUI", "ioDeviceEmulatorGUI\ioDeviceEmulatorGUI.csproj", "{8676A2B2-AD57-44CC-991A-80F34083A4AD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ioDeviceEmulator.Server", "ioDeviceEmulator\Server\ioDeviceEmulator.Server.csproj", "{9ED15C07-4884-46C3-A8F9-A4959481A1F6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ioDeviceEmulator.Server", "ioDeviceEmulator\Server\ioDeviceEmulator.Server.csproj", "{9ED15C07-4884-46C3-A8F9-A4959481A1F6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ioDeviceEmulator.Client", "ioDeviceEmulator\Client\ioDeviceEmulator.Client.csproj", "{BD60A494-6574-48E3-A02C-AC22A40FFF4F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ioDeviceEmulator.Client", "ioDeviceEmulator\Client\ioDeviceEmulator.Client.csproj", "{BD60A494-6574-48E3-A02C-AC22A40FFF4F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ioDeviceEmulator.Shared", "ioDeviceEmulator\Shared\ioDeviceEmulator.Shared.csproj", "{D52930F2-C452-43DC-9FBE-87C2C9C04CA4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ioDeviceEmulator.Shared", "ioDeviceEmulator\Shared\ioDeviceEmulator.Shared.csproj", "{D52930F2-C452-43DC-9FBE-87C2C9C04CA4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
