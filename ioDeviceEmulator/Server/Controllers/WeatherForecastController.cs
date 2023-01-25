@@ -13,15 +13,18 @@ namespace ioDeviceEmulator.Server.Controllers
     };
 
         private readonly ILogger<WeatherForecastController> _logger;
-
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        private readonly ProtoWeatherForecastService  _protoWeatherForecastService;
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, ProtoWeatherForecastService protoWeatherForecastService)
         {
             _logger = logger;
+            _protoWeatherForecastService = protoWeatherForecastService;
         }
 
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
+            _protoWeatherForecastService.EventSubject.OnNext("get values");
+
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateTime.Now.AddDays(index),

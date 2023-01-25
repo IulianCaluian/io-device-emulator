@@ -17,6 +17,7 @@ internal class Program
             opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
                 new[] { "application/octet-stream" });
         });
+        builder.Services.AddSingleton<ProtoWeatherForecastService>();
 
         var app = builder.Build();
 
