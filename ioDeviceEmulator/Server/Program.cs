@@ -1,4 +1,5 @@
 using ioDeviceEmulator.Server.Controllers;
+using ioDeviceEmulator.Server.Repo;
 using Microsoft.AspNetCore.ResponseCompression;
 
 internal class Program
@@ -18,6 +19,7 @@ internal class Program
                 new[] { "application/octet-stream" });
         });
         builder.Services.AddSingleton<ProtoWeatherForecastService>();
+        builder.Services.AddSingleton<DeviceState>();
 
         var app = builder.Build();
 
