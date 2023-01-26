@@ -1,6 +1,7 @@
 using ioDeviceEmulator.Server.Controllers;
 using ioDeviceEmulator.Server.Repo;
 using Microsoft.AspNetCore.ResponseCompression;
+using MudBlazor.Services;
 
 internal class Program
 {
@@ -20,6 +21,7 @@ internal class Program
         });
         builder.Services.AddSingleton<ProtoWeatherForecastService>();
         builder.Services.AddSingleton<DeviceState>();
+        builder.Services.AddMudServices();
 
         var app = builder.Build();
 

@@ -1,0 +1,109 @@
+﻿@page "/devicesimulator"
+
+@using MudBlazor
+
+
+<h3>Digital inputs</h3>
+
+@if (digitalInpuuts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    @foreach (var forecast in digitalInpuuts)
+    {
+        <MudPaper Row="true"  Class="d-flex align-center" >
+            <MudToggleIconButton @bind-Toggled="@forecast.Activated" 
+                         Icon="@Icons.Material.Filled.LinkOff" Color="@Color.Error" Title="Open"
+                         ToggledIcon="@Icons.Material.Filled.Link" ToggledColor="@Color.Success" ToggledTitle="Closed" />
+            <MudText>@forecast.Name is @(forecast.Activated ? "On (1)" : "Off (0)")</MudText>
+        </MudPaper>
+    }
+}
+<br/>
+<h3>Relays</h3>
+
+@if (relays == null)
+{
+        <p><em>Loading...</em></p>
+}
+else
+{
+    @foreach (var forecast in relays)
+    {
+                <MudPaper Row="true"  Class="d-flex align-center" Style="padding:12px">
+
+                    @if (forecast.Activated)
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.LinkOff" Color="Color.Success" />
+                    }else
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.LinkOff" style="@($"color:{Colors.Grey.Default};")"/>
+                    }
+
+                     <MudText Style="margin-left:12px"> @forecast.Name is @(forecast.Activated ? "On (1)" : "Off (0)")</MudText>
+                </MudPaper>
+    }
+}
+
+@code {
+    private IList<DigitalInputViewModel> digitalInpuuts;
+    private IList<RelayViewModel> relays;
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        // forecasts = (await WeatherForecastServiceClient.GetProtoWeatherForecastAsync(new Empty())).Forecasts;
+
+
+        digitalInpuuts = new List<DigitalInputViewModel>()
+        {
+            new DigitalInputViewModel()
+            {
+                Index = 0,
+                Name = "Digital input 0",
+                Activated = false
+            },
+            new DigitalInputViewModel()
+            {
+                Index = 1,
+                Name = "Digital input 1",
+                Activated = true
+            }
+        };
+
+        relays = new List<RelayViewModel>()
+        {
+            new RelayViewModel()
+            {
+                Index = 0,
+                Name = "relay 0",
+                Activated = true
+            },
+                   new RelayViewModel()
+            {
+                Index = 0,
+                Name = "relay 0",
+                Activated = false
+            }
+        };
+
+    }
+
+    public class DigitalInputViewModel
+    {
+        public int Index { get; set; }
+        public string Name { get; set; }
+        public bool Activated { get; set; }
+    }
+
+    public class RelayViewModel
+    {
+        public int Index { get; set; }
+        public string Name { get; set; }
+        public bool Activated { get; set; }
+    }
+
+}
