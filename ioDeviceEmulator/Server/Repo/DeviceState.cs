@@ -13,6 +13,11 @@
             return _device.DigitalInputs;
         }
 
+        public List<Relay> GetRelays()
+        {
+            return _device.Relays;
+        }
+
         internal bool CloseInput(int index)
         {
             DigitalInput? input = _device.DigitalInputs.Where(x => x.Index == index).FirstOrDefault();

@@ -4,10 +4,10 @@ using ioDeviceEmulator.Shared;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 
-namespace ioDeviceEmulator.Server.Controllers
+namespace ioDeviceEmulator.Server.GrpcServices
 {
-    public class ProtoWeatherForecastService: 
-        ioDeviceEmulator.Shared.ProtoWeatherForecastService.ProtoWeatherForecastServiceBase
+    public class WeatherForecastService :
+        Shared.ProtoWeatherForecastService.ProtoWeatherForecastServiceBase
 
     {
         private readonly Subject<string> _eventSubject;
@@ -18,7 +18,7 @@ namespace ioDeviceEmulator.Server.Controllers
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
-        public ProtoWeatherForecastService()
+        public WeatherForecastService()
         {
             _eventSubject = new Subject<string>();
         }
@@ -29,7 +29,7 @@ namespace ioDeviceEmulator.Server.Controllers
 
             response.Forecasts.AddRange(GetWeatherForecast());
 
-            return Task.FromResult<ProtoWeatherForecastResponse>(response);
+            return Task.FromResult(response);
         }
 
         //public override async Task GetProtoStreamWeatherFrocast(Empty request, IServerStreamWriter<ProtoWeatherForecast> responseStream, ServerCallContext context)

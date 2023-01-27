@@ -1,3 +1,4 @@
+using ioDeviceEmulator.Server.GrpcServices;
 using ioDeviceEmulator.Shared;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,8 +14,8 @@ namespace ioDeviceEmulator.Server.Controllers
     };
 
         private readonly ILogger<WeatherForecastController> _logger;
-        private readonly ProtoWeatherForecastService  _protoWeatherForecastService;
-        public WeatherForecastController(ILogger<WeatherForecastController> logger, ProtoWeatherForecastService protoWeatherForecastService)
+        private readonly WeatherForecastService  _protoWeatherForecastService;
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, WeatherForecastService protoWeatherForecastService)
         {
             _logger = logger;
             _protoWeatherForecastService = protoWeatherForecastService;

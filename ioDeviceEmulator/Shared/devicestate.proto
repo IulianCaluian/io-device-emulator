@@ -1,0 +1,39 @@
+﻿syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option csharp_namespace = "ioDeviceEmulator.Shared";
+
+package ProtoDeviceState;
+
+service ProtoDeviceStateService {
+	 rpc GetProtoDeviceState (google.protobuf.Empty) returns (ProtoDeviceStateResponse);
+}
+
+service GetProtoIOLogStreamService {
+	 rpc GetProtoIOLogStream (google.protobuf.Empty) returns (stream ProtoIOLog);
+}
+
+message ProtoDeviceStateResponse {
+  repeated ProtoDigitalInput digitalInputs = 1;
+  repeated ProtoRelay relays = 2;
+}
+
+message ProtoRelay {
+	int32 index = 2;
+	int32 status = 3;
+}
+
+message ProtoDigitalInput {
+	int32 index = 2;
+	int32 status = 3;
+}
+
+message ProtoIOLog {
+	google.protobuf.Timestamp dateTimeStamp = 1;
+	int32 ioType = 2;
+	int32 index = 3;
+	int32 status = 4;
+	string summary = 5;
+}
