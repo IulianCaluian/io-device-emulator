@@ -19,7 +19,6 @@ internal class Program
             opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
                 new[] { "application/octet-stream" });
         });
-        builder.Services.AddSingleton<WeatherForecastService>();
         builder.Services.AddSingleton<DeviceState>();
         builder.Services.AddSingleton<DeviceStateService>();
         builder.Services.AddSingleton<IOEventsStreamService>();
@@ -50,7 +49,6 @@ internal class Program
         app.UseGrpcWeb(new GrpcWebOptions { DefaultEnabled = true });
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapGrpcService<WeatherForecastService>();
             endpoints.MapGrpcService<DeviceStateService>();
             endpoints.MapGrpcService<IOEventsStreamService>();
         });

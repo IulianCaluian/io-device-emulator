@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <None Remove="devicestate.proto" />
-    <None Remove="protoweatherforecast.proto" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,7 +21,6 @@
 
   <ItemGroup>
     <Protobuf Include="devicestate.proto" />
-    <Protobuf Include="protoweatherforecast.proto" />
   </ItemGroup>
 
   <ItemGroup>

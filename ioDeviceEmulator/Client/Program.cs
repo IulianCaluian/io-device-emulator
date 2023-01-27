@@ -14,16 +14,6 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddMudServices();
 
-
-builder.Services.AddSingleton(services =>
-{
-    var httpClient = new HttpClient(new GrpcWebHandler(GrpcWebMode.GrpcWeb, new HttpClientHandler()));
-    var backendUrl = services.GetRequiredService<NavigationManager>().BaseUri;
-    var channel = GrpcChannel.ForAddress(backendUrl, new GrpcChannelOptions { HttpClient = httpClient });
-
-    return new ProtoWeatherForecastService.ProtoWeatherForecastServiceClient(channel);
-});
-
 builder.Services.AddSingleton(services =>
 {
     var httpClient = new HttpClient(new GrpcWebHandler(GrpcWebMode.GrpcWeb, new HttpClientHandler()));
