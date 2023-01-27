@@ -1,7 +1,9 @@
 ﻿@page "/devicesimulator"
 
 @inject ProtoDeviceStateService.ProtoDeviceStateServiceClient ProtoDeviceStateServiceClient
+@inject ProtoChangeDeviceIOStatusService.ProtoChangeDeviceIOStatusServiceClient ProtoChangeDeviceIOStatusServiceClient
 @inject ProtoIOEventsStreamService.ProtoIOEventsStreamServiceClient ProtoIOEventsStreamServiceClient
+@inject ISnackbar Snackbar
 
 @using Google.Protobuf.WellKnownTypes;
 @using Grpc.Core;
@@ -21,13 +23,15 @@
         }
         else
         {
-            @foreach (var forecast in digitalInpuuts)
+            @foreach (var di in digitalInpuuts)
             {
+                    var diIndex = di.Index;
+
                 <MudStack Row="true" Class="d-flex align-center">
-                    <MudToggleIconButton @bind-Toggled="@forecast.Activated" 
+                        <MudToggleIconButton Toggled="@di.Activated" ToggledChanged="@(e => UpdateDigitalInputStatus(e, diIndex))"
                                  Icon="@Icons.Material.Filled.LinkOff" Color="@Color.Error" Title="Open"
                                  ToggledIcon="@Icons.Material.Filled.Link" ToggledColor="@Color.Success" ToggledTitle="Closed" />
-                        <MudText Style="margin-right:12px">@forecast.Name is @(forecast.Activated ? "On (1)" : "Off (0)")</MudText>
+                        <MudText Style="margin-right:12px">@di.Name is @(di.Activated ? "On (1)" : "Off (0)")</MudText>
                 </MudStack>
             }
         }
@@ -199,6 +203,59 @@
         }
     }
 
+    private int SwitchedOnCount = 0;
+    private async void UpdateDigitalInputStatus(bool toggled, int diIndex)
+    {
+
+        var response = await ProtoChangeDeviceIOStatusServiceClient.SetProtoIOStatusAsync(new SetIOStatusRequest()
+        {
+            IoType = (int)ioElementType.DigitalInput,
+            Index = diIndex,
+            Status = toggled ? 1 : 0
+        });
+
+        Console.WriteLine("here response ");
+
+        if (response == null)
+            return;
+
+        if (response.Success == false) {
+
+            Console.WriteLine("success is false ");
+
+            var diVM = digitalInpuuts.Where(di => di.Index == diIndex).FirstOrDefault();
+
+            if (diVM == null)
+                return;
+
+            var tg = toggled;
+            var task = Task.Run(async () =>
+              {
+                  diVM.Activated = tg;
+                  await InvokeAsync(() => { this.StateHasChanged(); });
+
+                  await Task.Delay(200);
+
+                  diVM.Activated = !tg;
+                  await InvokeAsync(() => { this.StateHasChanged(); });
+              });
+
+
+            Snackbar.Add("Failed to change the digital input status.", Severity.Error);
+        } 
+
+
+    }
+
+
+
+    public static string ConvertIOTypeToString(int ioType)
+    {
+        return "Digital input";
+    }
+
+
+    #region ViewModels
     public class DigitalInputViewModel
     {
         public int Index { get; set; }
@@ -212,12 +269,5 @@
         public string? Name { get; set; }
         public bool Activated { get; set; }
     }
-
-    public static string ConvertIOTypeToString(int ioType)
-    {
-        return "Digital input";
-    }
-
-
-
+    #endregion
 }

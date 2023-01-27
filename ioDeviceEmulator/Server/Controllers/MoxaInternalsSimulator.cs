@@ -25,9 +25,9 @@ namespace ioDeviceEmulator.Server.Controllers
         public IActionResult CloseInput(int index)
         {
             // Perform some action to activate the input with the specified index
-            bool isActivated = _deviceState.CloseInput(index);
+            bool opResult = _deviceState.CloseInput(index);
 
-            if (isActivated)
+            if (opResult)
             {
                 _ioEventsStreamService.EventSubject.OnNext(new Models.IOEvent()
                 {
@@ -52,9 +52,9 @@ namespace ioDeviceEmulator.Server.Controllers
         public IActionResult OpenInput(int index)
         {
             // Perform some action to activate the input with the specified index
-            bool isActivated = _deviceState.OpenInput(index);
+            bool opResuult = _deviceState.OpenInput(index);
 
-            if (isActivated)
+            if (opResuult)
             {
                 _ioEventsStreamService.EventSubject.OnNext(new Models.IOEvent()
                 {

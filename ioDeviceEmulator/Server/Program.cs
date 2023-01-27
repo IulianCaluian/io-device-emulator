@@ -22,7 +22,7 @@ internal class Program
         builder.Services.AddSingleton<DeviceState>();
         builder.Services.AddSingleton<DeviceStateService>();
         builder.Services.AddSingleton<IOEventsStreamService>();
-        builder.Services.AddMudServices();
+
 
         var app = builder.Build();
 
@@ -50,7 +50,9 @@ internal class Program
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapGrpcService<DeviceStateService>();
+            endpoints.MapGrpcService<ChangeDeviceIOStatusService>();
             endpoints.MapGrpcService<IOEventsStreamService>();
+
         });
 
         app.Run();

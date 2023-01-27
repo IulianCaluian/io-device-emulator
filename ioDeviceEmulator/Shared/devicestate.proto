@@ -15,6 +15,10 @@ service ProtoIOEventsStreamService {
 	 rpc GetProtoIOEventsStream (google.protobuf.Empty) returns (stream ProtoIOEvent);
 }
 
+service ProtoChangeDeviceIOStatusService {
+	rpc SetProtoIOStatus (SetIOStatusRequest) returns (OperationResponse);
+}
+
 message ProtoDeviceStateResponse {
   repeated ProtoDigitalInput digitalInputs = 1;
   repeated ProtoRelay relays = 2;
@@ -36,4 +40,14 @@ message ProtoIOEvent {
 	int32 index = 3;
 	int32 status = 4;
 	string summary = 5;
+}
+
+message SetIOStatusRequest {
+	int32 ioType = 1;
+	int32 index = 2;
+	int32 status = 3;
+}
+
+message OperationResponse {
+	bool success = 1;
 }
