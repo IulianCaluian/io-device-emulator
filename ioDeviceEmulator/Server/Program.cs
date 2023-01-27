@@ -22,6 +22,7 @@ internal class Program
         builder.Services.AddSingleton<WeatherForecastService>();
         builder.Services.AddSingleton<DeviceState>();
         builder.Services.AddSingleton<DeviceStateService>();
+        builder.Services.AddSingleton<IOEventsStreamService>();
         builder.Services.AddMudServices();
 
         var app = builder.Build();
@@ -51,6 +52,7 @@ internal class Program
         {
             endpoints.MapGrpcService<WeatherForecastService>();
             endpoints.MapGrpcService<DeviceStateService>();
+            endpoints.MapGrpcService<IOEventsStreamService>();
         });
 
         app.Run();

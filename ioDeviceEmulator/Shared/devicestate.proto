@@ -11,8 +11,8 @@ service ProtoDeviceStateService {
 	 rpc GetProtoDeviceState (google.protobuf.Empty) returns (ProtoDeviceStateResponse);
 }
 
-service GetProtoIOLogStreamService {
-	 rpc GetProtoIOLogStream (google.protobuf.Empty) returns (stream ProtoIOLog);
+service ProtoIOEventsStreamService {
+	 rpc GetProtoIOEventsStream (google.protobuf.Empty) returns (stream ProtoIOEvent);
 }
 
 message ProtoDeviceStateResponse {
@@ -30,7 +30,7 @@ message ProtoDigitalInput {
 	int32 status = 3;
 }
 
-message ProtoIOLog {
+message ProtoIOEvent {
 	google.protobuf.Timestamp dateTimeStamp = 1;
 	int32 ioType = 2;
 	int32 index = 3;

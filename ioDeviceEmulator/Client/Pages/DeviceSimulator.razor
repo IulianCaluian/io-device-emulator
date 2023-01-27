@@ -1,8 +1,10 @@
 ﻿@page "/devicesimulator"
 
 @inject ProtoDeviceStateService.ProtoDeviceStateServiceClient ProtoDeviceStateServiceClient
+@inject ProtoIOEventsStreamService.ProtoIOEventsStreamServiceClient ProtoIOEventsStreamServiceClient
 
 @using Google.Protobuf.WellKnownTypes;
+@using Grpc.Core;
 @using MudBlazor
 @using ioDeviceEmulator.Shared;
 
@@ -25,7 +27,7 @@
                     <MudToggleIconButton @bind-Toggled="@forecast.Activated" 
                                  Icon="@Icons.Material.Filled.LinkOff" Color="@Color.Error" Title="Open"
                                  ToggledIcon="@Icons.Material.Filled.Link" ToggledColor="@Color.Success" ToggledTitle="Closed" />
-                    <MudText>@forecast.Name is @(forecast.Activated ? "On (1)" : "Off (0)")</MudText>
+                        <MudText Style="margin-right:12px">@forecast.Name is @(forecast.Activated ? "On (1)" : "Off (0)")</MudText>
                 </MudStack>
             }
         }
@@ -57,13 +59,55 @@
                         {
                             <MudIcon Icon="@Icons.Material.Filled.KeyboardOptionKey" style="@($"color:{Colors.Grey.Default};")" />
                         }
-                        <MudText Style="margin-left:12px"> @forecast.Name is @(forecast.Activated ? "On (1)" : "Off (0)")</MudText>
+                        <MudText Style="margin-left:12px margin-right:12px"> @forecast.Name is @(forecast.Activated ? "On (1)" : "Off (0)")</MudText>
                     </MudStack>
                 }
             }
 
         </MudPaper>
     </MudItem>
+    
+    <MudItem xs="12">
+
+        <MudPaper Class="pa-8 ma-2" Elevation="4" >
+
+            <h3>IO Events</h3>
+
+        @if (ioEvents == null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>IO Type</th>
+                        <th>Index</th>
+                        <th>Status</th>
+                        <th>Summary</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var ioEvent in ioEvents)
+                    {
+                        <tr>
+                            <td>@ioEvent.Date.ToLongTimeString()</td>
+                            <td>@ConvertIOTypeToString(ioEvent.IoType)</td>
+                            <td>@ioEvent.Index</td>
+                            <td>@ioEvent.Status</td>
+                            <td>@ioEvent.Summary</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        </MudPaper>
+
+    </MudItem>
+
 </MudGrid>
 
 @code {
@@ -71,8 +115,12 @@
     private IList<DigitalInputViewModel>? digitalInpuuts;
     private IList<RelayViewModel>? relays;
 
+    private IList<ProtoIOEvent> ioEvents = new List<ProtoIOEvent>();
+    private AsyncServerStreamingCall<ProtoIOEvent>? stream;
+
     protected override async Task OnInitializedAsync()
     {
+        // device state:
         var response = await ProtoDeviceStateServiceClient.GetProtoDeviceStateAsync(new Empty());
         var protoDis = response.DigitalInputs;
         var protoRs = response.Relays;
@@ -97,6 +145,58 @@
                 Name = $"Relay {pr.Index}",
                 Activated = pr.Status != 0 ? true : false
             });
+
+
+        // live events:
+        Console.WriteLine("start");
+        stream = ProtoIOEventsStreamServiceClient.GetProtoIOEventsStream(new Empty());
+        Console.WriteLine("lisening");
+
+        var task = Task.Run(async () =>
+        {
+            Console.WriteLine("wait");
+            while (await stream.ResponseStream.MoveNext())
+            {
+                try
+                {
+                    Console.WriteLine("get new data");
+                    ProtoIOEvent? protoEvent = stream.ResponseStream.Current;
+
+                    // Add in events list:
+                    ioEvents.Add(protoEvent);
+
+                    // Update element:
+                    UpdateTargetViewModelOfEvent(protoEvent);
+
+                    await InvokeAsync(() => { this.StateHasChanged(); });
+                    Console.WriteLine("lisening");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+            Console.WriteLine("done");
+        });
+
+    }
+
+    private void UpdateTargetViewModelOfEvent( ProtoIOEvent? ioEvent)
+    {
+        if (ioEvent?.IoType == (int)ioElementType.DigitalInput)
+        {
+            var di =  digitalInpuuts?.Where(di => di.Index == ioEvent.Index).FirstOrDefault();
+
+            if (di != null)
+                di.Activated = ioEvent.Status != 0 ? true : false;
+        } 
+        else if (ioEvent?.IoType == (int)ioElementType.Relay)
+        {
+            var r = relays?.Where(r => r.Index == ioEvent.Index).FirstOrDefault();
+
+            if (r != null)
+                r.Activated = ioEvent.Status != 0 ? true : false;
+        }
     }
 
     public class DigitalInputViewModel
@@ -112,5 +212,12 @@
         public string? Name { get; set; }
         public bool Activated { get; set; }
     }
+
+    public static string ConvertIOTypeToString(int ioType)
+    {
+        return "Digital input";
+    }
+
+
 
 }

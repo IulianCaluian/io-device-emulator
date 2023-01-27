@@ -1,5 +1,7 @@
 ﻿
+using ioDeviceEmulator.Server.GrpcServices;
 using ioDeviceEmulator.Server.Repo;
+using ioDeviceEmulator.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,10 +12,12 @@ namespace ioDeviceEmulator.Server.Controllers
     public class MoxaInternalsSimulator : ControllerBase
     {
         DeviceState _deviceState;
+        private readonly IOEventsStreamService _ioEventsStreamService;
 
-        public MoxaInternalsSimulator(DeviceState deviceState)
+        public MoxaInternalsSimulator(DeviceState deviceState, IOEventsStreamService ioEventsStreamService)
         {
             _deviceState = deviceState;
+            _ioEventsStreamService = ioEventsStreamService;
         }
 
         [HttpPut]
@@ -25,6 +29,15 @@ namespace ioDeviceEmulator.Server.Controllers
 
             if (isActivated)
             {
+                _ioEventsStreamService.EventSubject.OnNext(new Models.IOEvent()
+                {
+                    EventDate = DateTime.Now,
+                    IOType = ioElementType.DigitalInput,
+                    Index = index,
+                    Status = 1,
+                    Summary = "Simulator API close digital input"
+                });
+
                 return Ok();
             }
             else
@@ -43,6 +56,15 @@ namespace ioDeviceEmulator.Server.Controllers
 
             if (isActivated)
             {
+                _ioEventsStreamService.EventSubject.OnNext(new Models.IOEvent()
+                {
+                     EventDate = DateTime.Now,
+                     IOType = ioElementType.DigitalInput,
+                     Index = index,
+                     Status = 0,
+                     Summary = "Simulator API open digital input"
+                });
+
                 return Ok();
             }
             else
