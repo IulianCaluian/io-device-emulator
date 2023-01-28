@@ -1,0 +1,55 @@
+﻿@page "/barriersimulator"
+
+<MudGrid Justify="Justify.FlexStart" xs="12">
+
+    <MudItem>
+        <MudPaper Class="pa-8 ma-2" Elevation="4">
+
+            <h3>BarrierSimulator</h3>
+
+   
+      
+
+
+            <MudButton @onclick="DoRotate">Rotate</MudButton>
+
+            @rotation.ToString()
+
+            <div>
+                <img width="70" src="Images/barrier_body.svg" style="position:relative;" />
+            </div>
+            <div  class="movethis" style="position:relative; transform: translate(26px, -160px)">
+                <img width="230"  src="Images/barrier_arm.svg"
+                     style="transform: rotate(@(rotation)deg) !important; transform-origin: 11% 50%;">
+            </div>
+
+            
+
+        </MudPaper>
+
+    </MudItem>
+
+ </MudGrid>
+
+@code {
+    int rotation = 0;
+    bool opened = false;
+
+    async Task DoRotate()
+    {
+        opened = !opened;
+
+        for (int r = 0; r < 90; r += 1)
+        {
+            int dir = 1;
+            if (opened)
+                dir = -1;
+
+            rotation = (rotation + dir) % 360;
+            await Task.Delay(5);
+            StateHasChanged();
+        }
+        
+    }
+
+}
