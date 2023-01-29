@@ -1,4 +1,5 @@
 ﻿@page "/barriersimulator"
+@using ioDeviceEmulator.Client.ViewModels;
 
 <MudGrid Justify="Justify.FlexStart" xs="12">
 
@@ -7,20 +8,21 @@
 
             <h3>BarrierSimulator</h3>
 
-   
-      
+            <MudButton @onclick="OpenBarrier">Open</MudButton>
+            <MudButton @onclick="CloseBarrier">Close</MudButton>
+      @*      <MudButton @onclick="StartRaising">Stop</MudButton>*@
+            <MudButton @onclick="PauseBarrier">Stop</MudButton>
+@*            <MudButton @onclick="StartLowering">Stop</MudButton>*@
 
 
-            <MudButton @onclick="DoRotate">Rotate</MudButton>
-
-            @rotation.ToString()
+            @barrier.Rotation.ToString()
 
             <div>
                 <img width="70" src="Images/barrier_body.svg" style="position:relative;" />
             </div>
             <div  class="movethis" style="position:relative; transform: translate(26px, -160px)">
                 <img width="230"  src="Images/barrier_arm.svg"
-                     style="transform: rotate(@(rotation)deg) !important; transform-origin: 11% 50%;">
+                     style="transform: rotate(@(barrier.Rotation)deg) !important; transform-origin: 11% 50%;">
             </div>
 
             
@@ -32,24 +34,38 @@
  </MudGrid>
 
 @code {
-    int rotation = 0;
-    bool opened = false;
 
-    async Task DoRotate()
+    private BarrierViewModel barrier;
+
+    public BarrierSimulator()
     {
-        opened = !opened;
-
-        for (int r = 0; r < 90; r += 1)
-        {
-            int dir = 1;
-            if (opened)
-                dir = -1;
-
-            rotation = (rotation + dir) % 360;
-            await Task.Delay(5);
-            StateHasChanged();
-        }
-        
+        barrier = new BarrierViewModel();
+        barrier.RotationChanged += new EventHandler<EventArgs>(OnRotationChanged);
     }
+
+    public void OnRotationChanged(object? sender, EventArgs e)
+    {
+        StateHasChanged();
+    }
+
+    async Task OpenBarrier()
+    {
+        await barrier.OpenBarrier();
+    }
+
+    async Task CloseBarrier()
+    {
+        await barrier.CloseBarrier();
+    }
+
+    public Task PauseBarrier()
+    {
+        barrier.PauseBarrier();
+        return Task.CompletedTask;
+    }
+
+ 
+
+
 
 }
