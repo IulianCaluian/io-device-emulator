@@ -8,6 +8,7 @@
 @using Google.Protobuf.WellKnownTypes;
 @using Grpc.Core;
 @using MudBlazor
+@using ioDeviceEmulator.Client.ViewModels;
 @using ioDeviceEmulator.Shared;
 
 <MudGrid Justify="Justify.FlexStart" xs="12">
@@ -255,19 +256,4 @@
     }
 
 
-    #region ViewModels
-    public class DigitalInputViewModel
-    {
-        public int Index { get; set; }
-        public string? Name { get; set; }
-        public bool Activated { get; set; }
-    }
-
-    public class RelayViewModel
-    {
-        public int Index { get; set; }
-        public string? Name { get; set; }
-        public bool Activated { get; set; }
-    }
-    #endregion
 }
