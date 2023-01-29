@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ioDeviceEmulator.Client", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ioDeviceEmulator.Shared", "ioDeviceEmulator\Shared\ioDeviceEmulator.Shared.csproj", "{D52930F2-C452-43DC-9FBE-87C2C9C04CA4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ioDeviceEmulator.Tests", "ioDeviceEmulator.Tests\ioDeviceEmulator.Tests.csproj", "{A40C9970-88FA-4C56-8FFE-52870DEAE3CB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{D52930F2-C452-43DC-9FBE-87C2C9C04CA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D52930F2-C452-43DC-9FBE-87C2C9C04CA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D52930F2-C452-43DC-9FBE-87C2C9C04CA4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A40C9970-88FA-4C56-8FFE-52870DEAE3CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A40C9970-88FA-4C56-8FFE-52870DEAE3CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A40C9970-88FA-4C56-8FFE-52870DEAE3CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A40C9970-88FA-4C56-8FFE-52870DEAE3CB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

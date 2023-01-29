@@ -2,6 +2,7 @@
 using System;
 using System.Security.Cryptography.X509Certificates;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace ioDeviceEmulator.Client.Models
 {
@@ -29,8 +30,6 @@ namespace ioDeviceEmulator.Client.Models
         }
 
 
-        public string Name { get; set; }
-
         // Control:
         public BarrierTerminal Start { get; set; }
         public BarrierTerminal Stop { get; set; }
@@ -45,9 +44,8 @@ namespace ioDeviceEmulator.Client.Models
         public BarrierTerminal LoopDetector { get; set; }
 
 
-        public Barrier(string name, int autoClosingTimeInMs, int sppedOfOneDegMoveMs)
+        public Barrier(int autoClosingTimeInMs, int sppedOfOneDegMoveMs)
         {
-            Name = name;
             _autoClosingTime = autoClosingTimeInMs;
             _sppedOfOneDegMoveMs = sppedOfOneDegMoveMs;
 
@@ -115,8 +113,10 @@ namespace ioDeviceEmulator.Client.Models
 
             for (int i = Degree; i <= 90; i++)
             {
+                Debug.WriteLine("Here is " + i + " t:" + DateTime.UtcNow.ToString("fff"));
                 Degree = i;
                 await Task.Delay(_sppedOfOneDegMoveMs, _cts.Token);
+                Debug.WriteLine("Here is out " + i + " t:" + DateTime.UtcNow.ToString("fff"));
             }
         }
 
