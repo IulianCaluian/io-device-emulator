@@ -8,24 +8,42 @@
 
             <h3>BarrierSimulator</h3>
 
-            <MudButton @onclick="OpenBarrier">Open</MudButton>
+ @*           <MudButton @onclick="OpenBarrier">Open</MudButton>
             <MudButton @onclick="CloseBarrier">Close</MudButton>
-      @*      <MudButton @onclick="StartRaising">Stop</MudButton>*@
-            <MudButton @onclick="PauseBarrier">Stop</MudButton>
-@*            <MudButton @onclick="StartLowering">Stop</MudButton>*@
+            <MudButton @onclick="PauseBarrier">Stop</MudButton>*@
+
 
 
             @barrier.Rotation.ToString()
 
             <div>
-                <img width="70" src="Images/barrier_body.svg" style="position:relative;" />
-            </div>
-            <div  class="movethis" style="position:relative; transform: translate(26px, -160px)">
-                <img width="230"  src="Images/barrier_arm.svg"
-                     style="transform: rotate(@(barrier.Rotation)deg) !important; transform-origin: 11% 50%;">
+                <div>
+                    <img width="70" src="Images/barrier_body.svg" style="position:relative;" />
+                </div>
+                <div  class="movethis" style="position:relative; transform: translate(26px, -160px)">
+                    <img width="230"  src="Images/barrier_arm.svg"
+                         style="transform: rotate(@(barrier.Rotation)deg) !important; transform-origin: 11% 50%;">
+                </div>
             </div>
 
-            
+            @if (barrier.BarrierTerminals == null)
+            {
+                <p><em>Loading...</em></p>
+            }
+            else
+            {
+                @foreach (var di in barrier.BarrierTerminals)
+                {
+                    var diIndex = di.Index;
+
+                    <MudStack Row="true" Class="d-flex align-center">
+                        <MudToggleIconButton Toggled="@di.Activated" ToggledChanged="@(e => UpdateBarrierTerminalStatus(e, diIndex))"
+                                     Icon="@Icons.Material.Filled.LinkOff" Color="@Color.Error" Title="Open"
+                                     ToggledIcon="@Icons.Material.Filled.Link" ToggledColor="@Color.Success" ToggledTitle="Closed" />
+                        <MudText Style="margin-right:12px">@di.Name is @(di.Activated ? "On (1)" : "Off (0)")</MudText>
+                        </MudStack>
+                }
+            }
 
         </MudPaper>
 
@@ -48,23 +66,10 @@
         StateHasChanged();
     }
 
-    async Task OpenBarrier()
+    private void UpdateBarrierTerminalStatus(bool toggled, int diIndex)
     {
-        await barrier.OpenBarrier();
+        barrier.UpdateBarrierTerminal(diIndex, toggled);
     }
-
-    async Task CloseBarrier()
-    {
-        await barrier.CloseBarrier();
-    }
-
-    public Task PauseBarrier()
-    {
-        barrier.PauseBarrier();
-        return Task.CompletedTask;
-    }
-
- 
 
 
 
