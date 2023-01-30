@@ -1,19 +1,22 @@
-﻿using System.Xml.Linq;
+﻿using ioDeviceEmulator.Client.Models;
+using System.Xml.Linq;
 using System;
+using ioDeviceEmulator.Client.Models;
 
 namespace ioDeviceEmulator.Client.ViewModels
 {
     public class BarrierViewModel
     {
-    
+        private const int _indexStart = 0;
+        private const int _indexStop = 0;
+        private const int _indexStart2 = 0;
+        private const int _indexPhotoCell = 0;
+        private const int _indexLoopDetector = 0;
 
         private readonly object _lock = new object();
         private CancellationTokenSource _cts = new CancellationTokenSource();
 
         private int _rotation = 0;
-
-        public event EventHandler<EventArgs>? RotationChanged;
-
         public int Rotation
         {
             get { return _rotation; }
@@ -28,44 +31,83 @@ namespace ioDeviceEmulator.Client.ViewModels
                 }
             }
         }
-
+        public event EventHandler<EventArgs>? RotationChanged;
+        
         public IList<DigitalInputViewModel> BarrierTerminals { get; private set; }
+
+        private Models.Barrier _barrier;
+
+
 
         public BarrierViewModel()
         {
-            BarrierTerminals = new List<DigitalInputViewModel>();
-            BarrierTerminals.Add(new DigitalInputViewModel()
-            {
-                Index = 0,
-                Name = "Open",
-                Activated = false
-            });
-            BarrierTerminals.Add(new DigitalInputViewModel()
-            {
-                Index = 1,
-                Name = "Close",
-                Activated = false
-            });
+            _barrier = new Models.Barrier(1000);
+            _barrier.BarrierStateChanged += new EventHandler<BarrierStateChangedEventArgs>(Barrier_StateChanged);
 
-            BarrierTerminals.Add(new DigitalInputViewModel()
+            BarrierTerminals = new List<DigitalInputViewModel>
             {
-                Index = 2,
-                Name = "Push to open button",
-                Activated = false
-            });
-            BarrierTerminals.Add(new DigitalInputViewModel()
-            {
-                Index = 3,
-                Name = " Photo Cell",
-                Activated = false
-            });
-            BarrierTerminals.Add(new DigitalInputViewModel()
-            {
-                Index = 4,
-                Name = "Loop Detector",
-                Activated = false
-            });
+                new DigitalInputViewModel()
+                {
+                    Index = _indexStart,
+                    Name = "Open",
+                    Activated = false
+                },
+                new DigitalInputViewModel()
+                {
+                    Index = _indexStop,
+                    Name = "Close",
+                    Activated = false
+                },
+                new DigitalInputViewModel()
+                {
+                    Index = _indexStart2,
+                    Name = "Push to open button",
+                    Activated = false
+                },
+                new DigitalInputViewModel()
+                {
+                    Index = _indexPhotoCell,
+                    Name = " Photo Cell",
+                    Activated = false
+                },
+                new DigitalInputViewModel()
+                {
+                    Index = _indexLoopDetector,
+                    Name = "Loop Detector",
+                    Activated = false
+                }
+            };
 
+        }
+
+        public void UpdateBarrierTerminal(int terminalIndex, bool activated)
+        {
+            var diVM = BarrierTerminals.Where(di => di.Index == terminalIndex).FirstOrDefault();
+
+            if (diVM == null)
+                return;
+
+            diVM.Activated = activated;
+
+            if (terminalIndex == _indexStart)
+            {
+                _barrier.Start.Activated = activated;
+            }
+            else if (terminalIndex == _indexStop)
+            {
+                _barrier.Stop.Activated = activated;
+            }
+        }
+
+
+
+        private void Barrier_StateChanged(object? sender, BarrierStateChangedEventArgs e)
+        {
+            if (e.NewState == BarrierState.Opening)
+                Task.Run(() => OpenBarrier());
+
+            else if (e.NewState == BarrierState.Closing)
+                Task.Run(() => CloseBarrier());
         }
 
         private  async Task OpenBarrier()
@@ -86,6 +128,10 @@ namespace ioDeviceEmulator.Client.ViewModels
                 await Task.Delay(5, cts.Token);
                 OnRotationChanged();
             }
+
+            if (!cts.IsCancellationRequested)
+                if (Rotation == 90)
+                    _barrier.SetStateToOpened();
 
         }
 
@@ -108,28 +154,21 @@ namespace ioDeviceEmulator.Client.ViewModels
                 OnRotationChanged();
             }
 
+            if (!cts.IsCancellationRequested)
+                if (Rotation == 90)
+                    _barrier.SetStateToClosed();
         }
 
-        private Task PauseBarrier()
-        {
-            _cts.Cancel();
-            return Task.CompletedTask;
-        }
+        //private Task PauseBarrier()
+        //{
+        //    _cts.Cancel();
+        //    return Task.CompletedTask;
+        //}
 
         private void OnRotationChanged()
         {
             RotationChanged?.Invoke(this, EventArgs.Empty);
         }
 
-
-        public void UpdateBarrierTerminal(int terminalIndex, bool activated)
-        {
-            var diVM = BarrierTerminals.Where(di => di.Index == terminalIndex).FirstOrDefault();
-
-            if (diVM == null)
-                return;
-
-            diVM.Activated = activated;
-        }
     }
 }
