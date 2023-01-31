@@ -55,11 +55,12 @@
 
     private BarrierViewModel barrier;
 
-    public BarrierSimulator()
+    public BarrierSimulator( )
     {
         barrier = new BarrierViewModel();
         barrier.RotationChanged += new EventHandler<EventArgs>(OnRotationChanged);
     }
+
 
     public void OnRotationChanged(object? sender, EventArgs e)
     {
