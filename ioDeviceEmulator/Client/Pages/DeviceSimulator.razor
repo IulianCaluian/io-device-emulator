@@ -254,7 +254,12 @@
             var r = relays?.Where(r => r.Index == ioEvent.Index).FirstOrDefault();
 
             if (r != null)
+            {
                 r.Activated = ioEvent.Status != 0 ? true : false;
+
+                if (r.Index == 0)
+                    barrier.UpdateBarrierTerminal(0, r.Activated);
+            }
         }
     }
 

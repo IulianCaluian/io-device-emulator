@@ -73,6 +73,59 @@ namespace ioDeviceEmulator.Server.Controllers
             }
         }
 
+        [HttpPut]
+        [Route("relay/close/{index}")]
+        public IActionResult CloseRelay(int index)
+        {
+            // Perform some action to activate the input with the specified index
+            bool opResult = _deviceState.CloseInput(index);
+
+            if (opResult)
+            {
+                _ioEventsStreamService.EventSubject.OnNext(new Models.IOEvent()
+                {
+                    EventDate = DateTime.Now,
+                    IOType = ioElementType.Relay,
+                    Index = index,
+                    Status = 1,
+                    Summary = "Simulator API close relay"
+                });
+
+                return Ok();
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+
+        [HttpPut]
+        [Route("relay/open/{index}")]
+        public IActionResult OpenRelay(int index)
+        {
+            // Perform some action to activate the input with the specified index
+            bool opResuult = _deviceState.OpenInput(index);
+
+            if (opResuult)
+            {
+                _ioEventsStreamService.EventSubject.OnNext(new Models.IOEvent()
+                {
+                    EventDate = DateTime.Now,
+                    IOType = ioElementType.Relay,
+                    Index = index,
+                    Status = 0,
+                    Summary = "Simulator API open relay"
+                });
+
+                return Ok();
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
 
     }
 }

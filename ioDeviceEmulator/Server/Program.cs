@@ -22,7 +22,7 @@ internal class Program
         builder.Services.AddSingleton<DeviceState>();
         builder.Services.AddSingleton<DeviceStateService>();
         builder.Services.AddSingleton<IOEventsStreamService>();
-
+        builder.Services.AddControllers().AddNewtonsoftJson();
 
         var app = builder.Build();
 

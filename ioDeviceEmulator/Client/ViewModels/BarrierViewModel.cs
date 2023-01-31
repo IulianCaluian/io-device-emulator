@@ -128,7 +128,7 @@ namespace ioDeviceEmulator.Client.ViewModels
                     break;
 
                 Rotation++;
-                await Task.Delay(5, cts.Token);
+                await Task.Delay(10, cts.Token);
                 OnRotationChanged();
             }
 
@@ -153,7 +153,7 @@ namespace ioDeviceEmulator.Client.ViewModels
                     break;
 
                 Rotation--;
-                await Task.Delay(5, cts.Token);
+                await Task.Delay(10, cts.Token);
                 OnRotationChanged();
             }
 

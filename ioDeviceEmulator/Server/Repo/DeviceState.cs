@@ -50,6 +50,22 @@
             return false;
         }
 
+        internal bool SetRelay(int index, int status)
+        {
+            Relay? relay = _device.Relays.Where(x => x.Index == index).FirstOrDefault();
+
+            if (relay == null)
+                return false;
+
+            if (relay.Mode == 0)
+            {
+                var di = (RelayRelay)relay;
+                di.Status = status;
+                return true;
+            }
+
+            return false;
+        }
      
 
         private void SetDigitalInputDI(DigitalInput input, int status)
