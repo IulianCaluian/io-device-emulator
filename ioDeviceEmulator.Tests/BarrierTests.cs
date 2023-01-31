@@ -120,27 +120,22 @@ namespace ioDeviceEmulator.Tests
             Assert.AreEqual(BarrierState.Opened, barrier.GetBarrierState());
         }
 
-        //[TestMethod]
-        //public async Task SetStateToOpened_ShouldKeepItOpenedIfStartActivated()
-        //{
-        //    // Arrange
-        //    var barrier = new Client.Models.Barrier(10);
-        //    barrier.Start.Activated = true;
-        //    barrier.Start2.Activated = false;
-        //    barrier.SetStateToOpened();
+        [TestMethod]
+        public async Task StartDectivated_ShouldStartClosingAfterAutoClosingTime()
+        {
+            // Arrange
+            var barrier = new Client.Models.Barrier(10);
+            barrier.Start.Activated = true;
+            barrier.Start2.Activated = false;
+            barrier.SetStateToOpened();
 
-        //    // Act
+            // Act
+            barrier.Start.Activated = false;
+            await Task.Delay(100);
 
-        //    barrier.Start.Activated = true;
-        //    await Task.Delay(100);
-
-        //    // Assert
-        //    Assert.AreEqual(BarrierState.Closing, barrier.GetBarrierState());
-
-        //    // Act
-
-        //    // Assert
-        //}
+            // Assert
+            Assert.AreEqual(BarrierState.Closing, barrier.GetBarrierState());
+        }
 
     }
 }

@@ -3,6 +3,8 @@ using System;
 using System.Security.Cryptography.X509Certificates;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using Microsoft.Extensions.Logging;
+using ioDeviceEmulator.Client.Pages;
 
 namespace ioDeviceEmulator.Client.Models
 {
@@ -142,8 +144,11 @@ namespace ioDeviceEmulator.Client.Models
                     _cts = cts = new CancellationTokenSource();
                 }
 
+                try
+                {
+                    await Task.Delay(_autoClosingTime, cts.Token);
+                }catch(TaskCanceledException) { }
 
-                await Task.Delay(_autoClosingTime, cts.Token);
                 if (!cts.IsCancellationRequested)
                     ChangeStateToClosing();
             }
