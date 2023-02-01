@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Net;
 
 namespace ioDeviceEmulator.Server.Controllers
 {
@@ -25,18 +26,36 @@ namespace ioDeviceEmulator.Server.Controllers
 
         [HttpGet]
         [Route("di")]
-        public string Get()
+        public string GetDigitalInputs()
         {
             var dis = _deviceState.GetDigitalInputs();
 
             List<dynamic> dynamicDiList = new List<dynamic>();
-            foreach (var di in dis)
+            foreach (DigitalInput di in dis)
             {
                 dynamicDiList.Add(di.ToJsonObject());
             }
 
             // Create the parent object
             var jsonObject = new { slot = 0, io = new { di = dynamicDiList } };
+
+            var json = JsonConvert.SerializeObject(jsonObject);
+
+            return json;
+        }
+
+        [HttpGet("relay")]
+        public string GetRelays()
+        {
+            var relays = _deviceState.GetRelays();
+            List<dynamic> dynamicRelsList = new List<dynamic>();
+            foreach (Relay di in relays)
+            {
+                dynamicRelsList.Add(di.ToJsonObject());
+            }
+
+            // Create the parent object
+            var jsonObject = new { slot = 0, io = new { relay = dynamicRelsList } };
 
             var json = JsonConvert.SerializeObject(jsonObject);
 

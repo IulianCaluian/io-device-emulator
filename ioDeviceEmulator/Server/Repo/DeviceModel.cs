@@ -81,6 +81,12 @@ namespace ioDeviceEmulator.Server.Repo
     {
         public int Index { get; set; }
         public int Mode { get; protected set; }
+
+        public virtual object ToJsonObject()
+        {
+            object obj = new object();
+            return obj;
+        }
     }
     public class RelayRelay : Relay
     {
@@ -93,6 +99,18 @@ namespace ioDeviceEmulator.Server.Repo
         public int TotalCount { get; set; }
         public int CurrentCount { get; set; }
         public int CurrentCountReset { get; set; }
+
+        public override object ToJsonObject()
+        {
+            jsonRelayRelay jObj = new jsonRelayRelay();
+            jObj.relayIndex = Index;
+            jObj.relayMode = Mode;
+            jObj.relayStatus = Status;
+            jObj.relayTotalCount = TotalCount;
+            jObj.relayCurrentCount = CurrentCount;
+            jObj.relayCurrentCountReset = CurrentCountReset;
+            return jObj;
+        }
 
     }
 
@@ -108,6 +126,16 @@ namespace ioDeviceEmulator.Server.Repo
          public int PulseOnWidth      { get; set; }
          public int PulseOffWidth { get; set; }
 
+    }
+
+    public class jsonRelayRelay
+    {
+        public int relayIndex { get; set; }
+        public int relayMode { get; set; }
+        public int relayStatus { get; set; }
+        public int relayTotalCount { get; set; }
+        public int relayCurrentCount { get; set; }
+        public int relayCurrentCountReset { get; set; }
     }
 
 }
