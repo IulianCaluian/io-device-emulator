@@ -11,111 +11,146 @@
 @using ioDeviceEmulator.Client.ViewModels;
 @using ioDeviceEmulator.Shared;
 
+@implements IDisposable;
+
+
 <MudGrid Justify="Justify.FlexStart" xs="12">
 
-    <MudItem >
-        <MudPaper Class="pa-8 ma-2" Elevation="4" Height="401px">
+    <MudItem>
+    <MudPaper Class="border-solid border-2 mud-border-primary pa-4" Elevation="0">
 
-        <h3>Digital inputs</h3>
+        <h3>MOXA</h3>
 
-        @if (digitalInpuuts == null)
-        {
-            <p><em>Loading...</em></p>
-        }
-        else
-        {
-            @foreach (var di in digitalInpuuts)
-            {
-                    var diIndex = di.Index;
+    <MudGrid Justify="Justify.FlexStart" xs="12">
+                <MudItem>
+                    <MudPaper Class="pa-8 ma-2" Elevation="4" Height="401px">
 
-                <MudStack Row="true" Class="d-flex align-center">
-                        <MudToggleIconButton Toggled="@di.Activated" ToggledChanged="@(e => UpdateDigitalInputStatus(e, diIndex))"
-                                 Icon="@Icons.Material.Filled.LinkOff" Color="@Color.Error" Title="Open"
-                                 ToggledIcon="@Icons.Material.Filled.Link" ToggledColor="@Color.Success" ToggledTitle="Closed" />
-                        <MudText Style="margin-right:12px">@di.Name is @(di.Activated ? "On (1)" : "Off (0)")</MudText>
-                </MudStack>
-            }
-        }
+                        <h3>Digital inputs</h3>
 
-        </MudPaper>
-
-    </MudItem>
-
-    <MudItem >
-
-        <MudPaper Class="pa-8 ma-2" Elevation="4" Height="400px">
-
-            <h3>Relays</h3>
-
-            @if (relays == null)
-            {
-                    <p><em>Loading...</em></p>
-            }
-            else
-            {
-                @foreach (var forecast in relays)
-                {
-                    <MudStack Row="true"  Class="d-flex align-center" Style="padding:12px">
-                        @if (forecast.Activated)
+                        @if (digitalInpuuts == null)
                         {
-                            <MudIcon Icon="@Icons.Material.Filled.KeyboardOptionKey" Color="Color.Success" />
+                            <p><em>Loading...</em></p>
                         }
                         else
                         {
-                            <MudIcon Icon="@Icons.Material.Filled.KeyboardOptionKey" style="@($"color:{Colors.Grey.Default};")" />
+                            @foreach (var di in digitalInpuuts)
+                            {
+                                var diIndex = di.Index;
+
+                                <MudStack Row="true" Class="d-flex align-center">
+                                    <MudToggleIconButton Toggled="@di.Activated" ToggledChanged="@(e => UpdateDigitalInputStatus(e, diIndex))"
+                                                 Icon="@Icons.Material.Filled.LinkOff" Color="@Color.Error" Title="Open"
+                                                 ToggledIcon="@Icons.Material.Filled.Link" ToggledColor="@Color.Success" ToggledTitle="Closed" />
+                                    <MudText Style="margin-right:12px">@di.Name is @(di.Activated ? "On (1)" : "Off (0)")</MudText>
+                                    </MudStack>
+                            }
                         }
-                        <MudText Style="margin-left:12px margin-right:12px"> @forecast.Name is @(forecast.Activated ? "On (1)" : "Off (0)")</MudText>
-                    </MudStack>
-                }
-            }
 
-        </MudPaper>
-    </MudItem>
-    
-    <MudItem>
-        <MudPaper Class="pa-8 ma-2" Elevation="4" Height="400px">
-         
-            <MudStack Row="true">
-      
-                <div>
-                    <h3>Barrier Simulator</h3>
-                    
-                    <div style="margin:12px; margin-top:20px;">
-                        Rotation @barrier.Rotation.ToString()
-                    </div>
+                    </MudPaper>
 
-                    @if (barrier.BarrierTerminals == null)
-                    {
-                        <p><em>Loading...</em></p>
-                    }
-                    else
-                    {
-                        @foreach (var di in barrier.BarrierTerminals)
+                </MudItem>
+
+                <MudItem>
+
+                    <MudPaper Class="pa-8 ma-2" Elevation="4" Height="400px">
+
+                        <h3>Relays</h3>
+
+                        @if (relays == null)
                         {
-                            var diIndex = di.Index;
-
-                            <MudStack Row="true" Class="d-flex align-center">
-                                <MudToggleIconButton Toggled="@di.Activated" ToggledChanged="@(e => UpdateBarrierTerminalStatus(e, diIndex))"
-                                             Icon="@Icons.Material.Filled.LinkOff" Color="@Color.Error" Title="Open"
-                                             ToggledIcon="@Icons.Material.Filled.Link" ToggledColor="@Color.Success" ToggledTitle="Closed" />
-                                <MudText Style="margin-right:12px">@di.Name is @(di.Activated ? "On (1)" : "Off (0)")</MudText>
-                                </MudStack>
+                            <p><em>Loading...</em></p>
                         }
-                    }
-                 
-                </div>
-                <div style=" height:174px; margin-top:148px; margin-right:20px">
-                    <div>
-                        <img width="70" src="Images/barrier_body.svg" style="position:relative;" />
-                    </div>
-                    <div class="movethis" style="position:relative; transform: translate(26px, -160px)">
-                        <img width="230" src="Images/barrier_arm.svg"
-                             style="transform: rotate(@(-barrier.Rotation)deg) !important; transform-origin: 11% 50%;">
-                    </div>
-                </div>
-            </MudStack>
-        </MudPaper>
+                        else
+                        {
+                            @foreach (var forecast in relays)
+                            {
+                                <MudStack Row="true" Class="d-flex align-center" Style="padding:12px">
+                                    @if (forecast.Activated)
+                                    {
+                                        <MudIcon Icon="@Icons.Material.Filled.KeyboardOptionKey" Color="Color.Success" />
+                                    }
+                                    else
+                                    {
+                                        <MudIcon Icon="@Icons.Material.Filled.KeyboardOptionKey" style="@($"color:{Colors.Grey.Default};")" />
+                                    }
+                                    <MudText Style="margin-left:12px margin-right:12px"> @forecast.Name is @(forecast.Activated ? "On (1)" : "Off (0)")</MudText>
+                                    </MudStack>
+                            }
+                        }
+
+                    </MudPaper>
+                </MudItem>
+    </MudGrid>
+
+
+    </MudPaper>
+
     </MudItem>
+
+
+
+
+    <MudItem>
+        <MudPaper Class="border-solid border-2 mud-border-primary pa-4" Elevation="0">
+        <h3>Barrier</h3>
+        <MudItem>
+
+              <MudGrid Justify="Justify.FlexStart" xs="12">
+                  <MudItem>
+            <MudPaper Class="pa-8 ma-2" Elevation="4" Height="400px">
+
+                <MudStack Row="true">
+
+                    <div>
+                        <h3>Barrier Simulator</h3>
+
+                        <div style="margin:12px; margin-top:20px;">
+                            Rotation @barrier.Rotation.ToString()
+                        </div>
+
+                        @if (barrier.BarrierTerminals == null)
+                        {
+                            <p><em>Loading...</em></p>
+                        }
+                        else
+                        {
+                            @foreach (var di in barrier.BarrierTerminals)
+                            {
+                                var diIndex = di.Index;
+
+                                <MudStack Row="true" Class="d-flex align-center">
+                                    <MudToggleIconButton Toggled="@di.Activated" ToggledChanged="@(e => UpdateBarrierTerminalStatus(e, diIndex))"
+                                                 Icon="@Icons.Material.Filled.LinkOff" Color="@Color.Error" Title="Open"
+                                                 ToggledIcon="@Icons.Material.Filled.Link" ToggledColor="@Color.Success" ToggledTitle="Closed" />
+                                    <MudText Style="margin-right:12px">@di.Name is @(di.Activated ? "On (1)" : "Off (0)")</MudText>
+                                    </MudStack>
+                            }
+                        }
+
+                    </div>
+                    <div style=" height:174px; margin-top:148px; margin-right:20px">
+                        <div>
+                            <img width="70" src="Images/barrier_body.svg" style="position:relative;" />
+                        </div>
+                        <div class="movethis" style="position:relative; transform: translate(26px, -160px)">
+                            <img width="230" src="Images/barrier_arm.svg"
+                                 style="transform: rotate(@(-barrier.Rotation)deg) !important; transform-origin: 11% 50%;">
+                        </div>
+                    </div>
+                </MudStack>
+            </MudPaper>
+
+                    </MudItem>
+        </MudGrid>
+        
+        </MudItem>
+        </MudPaper>
+ 
+
+    </MudItem>
+
+    
+
 
     <MudItem xs="12">
 
@@ -205,18 +240,17 @@
 
 
         // live events:
-        Console.WriteLine("start");
         stream = ProtoIOEventsStreamServiceClient.GetProtoIOEventsStream(new Empty());
-        Console.WriteLine("lisening");
 
         var task = Task.Run(async () =>
         {
-            Console.WriteLine("wait");
+
             while (await stream.ResponseStream.MoveNext())
             {
                 try
                 {
-                    Console.WriteLine("get new data");
+                    Console.WriteLine("Received a new stream IO event.");
+
                     ProtoIOEvent? protoEvent = stream.ResponseStream.Current;
 
                     // Add in events list:
@@ -226,19 +260,25 @@
                     UpdateTargetViewModelOfEvent(protoEvent);
 
                     await InvokeAsync(() => { this.StateHasChanged(); });
-                    Console.WriteLine("lisening");
+                        
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    Console.WriteLine("Exception" + ex.Message);
                 }
             }
-            Console.WriteLine("done");
+
         });
 
 
 
     }
+
+    public void Dispose()
+    {
+        stream?.Dispose();
+    }
+
 
     private void UpdateTargetViewModelOfEvent( ProtoIOEvent? ioEvent)
     {

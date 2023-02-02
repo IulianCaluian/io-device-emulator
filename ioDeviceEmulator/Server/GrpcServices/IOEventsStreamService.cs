@@ -2,8 +2,11 @@
 using Grpc.Core;
 using ioDeviceEmulator.Server.Models;
 using ioDeviceEmulator.Shared;
+using MudBlazor;
+using System.Diagnostics;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Transactions;
 
 namespace ioDeviceEmulator.Server.GrpcServices
 {
@@ -39,9 +42,11 @@ namespace ioDeviceEmulator.Server.GrpcServices
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Some clients closed." + ex);
+                    Debug.WriteLine("A client stream has been closed.");
+                       
                 }
             });
+            
         }
     }
 }

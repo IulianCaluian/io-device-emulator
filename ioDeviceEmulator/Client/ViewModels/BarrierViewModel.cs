@@ -127,7 +127,7 @@ namespace ioDeviceEmulator.Client.ViewModels
                 if (cts.IsCancellationRequested)
                     break;
 
-                Rotation++;
+                Rotation += 1;
                 await Task.Delay(10, cts.Token);
                 OnRotationChanged();
             }
@@ -152,7 +152,7 @@ namespace ioDeviceEmulator.Client.ViewModels
                 if (cts.IsCancellationRequested)
                     break;
 
-                Rotation--;
+                Rotation -= 1;
                 await Task.Delay(10, cts.Token);
                 OnRotationChanged();
             }
