@@ -33,6 +33,7 @@ builder.Services.AddSingleton(services =>
 builder.Services.AddSingleton(services =>
 {
     var httpClient = new HttpClient(new GrpcWebHandler(GrpcWebMode.GrpcWeb, new HttpClientHandler()));
+    httpClient.Timeout = Timeout.InfiniteTimeSpan;
     var backendUrl = services.GetRequiredService<NavigationManager>().BaseUri;
     var channel = GrpcChannel.ForAddress(backendUrl, new GrpcChannelOptions { HttpClient = httpClient });
 
