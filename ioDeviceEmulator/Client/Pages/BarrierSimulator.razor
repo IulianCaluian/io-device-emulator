@@ -14,7 +14,7 @@
 
 
 
-            @barrier.Rotation.ToString()
+      
 
             <div>
                 <div>
@@ -22,7 +22,7 @@
                 </div>
                 <div  class="movethis" style="position:relative; transform: translate(26px, -160px)">
                     <img width="230"  src="Images/barrier_arm.svg"
-                         style="transform: rotate(@(barrier.Rotation)deg) !important; transform-origin: 11% 50%;">
+                         style=" transform-origin: 11% 50%;">
                 </div>
             </div>
 
@@ -58,7 +58,6 @@
     public BarrierSimulator( )
     {
         barrier = new BarrierViewModel();
-        barrier.RotationChanged += new EventHandler<EventArgs>(OnRotationChanged);
     }
 
 

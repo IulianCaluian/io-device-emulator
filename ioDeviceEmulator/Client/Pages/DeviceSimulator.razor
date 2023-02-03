@@ -1,17 +1,26 @@
 ﻿@page "/devicesimulator"
 
-@inject ProtoDeviceStateService.ProtoDeviceStateServiceClient ProtoDeviceStateServiceClient
-@inject ProtoChangeDeviceIOStatusService.ProtoChangeDeviceIOStatusServiceClient ProtoChangeDeviceIOStatusServiceClient
-@inject ProtoIOEventsStreamService.ProtoIOEventsStreamServiceClient ProtoIOEventsStreamServiceClient
-@inject ISnackbar Snackbar
 
 @using Google.Protobuf.WellKnownTypes;
 @using Grpc.Core;
 @using MudBlazor
 @using ioDeviceEmulator.Client.ViewModels;
 @using ioDeviceEmulator.Shared;
+@using Microsoft.JSInterop;
+
+@inject ProtoDeviceStateService.ProtoDeviceStateServiceClient ProtoDeviceStateServiceClient
+@inject ProtoChangeDeviceIOStatusService.ProtoChangeDeviceIOStatusServiceClient ProtoChangeDeviceIOStatusServiceClient
+@inject ProtoIOEventsStreamService.ProtoIOEventsStreamServiceClient ProtoIOEventsStreamServiceClient
+@inject ISnackbar Snackbar
+@inject IJSRuntime JSRuntime
+
+
 
 @implements IDisposable;
+
+
+
+
 
 
 <MudGrid Justify="Justify.FlexStart" xs="12">
@@ -104,10 +113,6 @@
                     <div>
                         <h3>Barrier Simulator</h3>
 
-                        <div style="margin:12px; margin-top:20px;">
-                            Rotation @barrier.Rotation.ToString()
-                        </div>
-
                         @if (barrier.BarrierTerminals == null)
                         {
                             <p><em>Loading...</em></p>
@@ -133,8 +138,12 @@
                             <img width="70" src="Images/barrier_body.svg" style="position:relative;" />
                         </div>
                         <div class="movethis" style="position:relative; transform: translate(26px, -160px)">
-                            <img width="230" src="Images/barrier_arm.svg"
-                                 style="transform: rotate(@(-barrier.Rotation)deg) !important; transform-origin: 11% 50%;">
+                                 <img id="rotating-image" width="230" src="Images/barrier_arm.svg"
+                                    style=" transform-origin: 11% 50%;">
+                                      @*  transform: rotate(@(-barrier.Rotation)deg) !important;*@
+
+
+
                         </div>
                     </div>
                 </MudStack>
@@ -204,14 +213,26 @@
     private IList<ProtoIOEvent> ioEvents = new List<ProtoIOEvent>();
     private AsyncServerStreamingCall<ProtoIOEvent>? stream;
 
+
+    private bool _lastCmdTryToOpen;
+    public readonly object lockObj = new object();
+
+    private IJSObjectReference? _jsModule;
+    private DotNetObjectReference<DeviceSimulator> _dotNetReference;
+    private IJSObjectReference? _rotatingImage;
+
     public DeviceSimulator()
     {
         barrier = new BarrierViewModel();
-        barrier.RotationChanged += new EventHandler<EventArgs>(OnRotationChanged);
+        barrier.RotatingOpenStarted += new EventHandler<EventArgs>(OnRotationOpenStarted);
+        barrier.RotationCloseStarted += new EventHandler<EventArgs>(OnRotationCloseStarted);
     }
 
+ 
     protected override async Task OnInitializedAsync()
     {
+        _jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./scripts/rotationScript.js");
+
         // device state:
         var response = await ProtoDeviceStateServiceClient.GetProtoDeviceStateAsync(new Empty());
         var protoDis = response.DigitalInputs;
@@ -260,7 +281,7 @@
                     UpdateTargetViewModelOfEvent(protoEvent);
 
                     await InvokeAsync(() => { this.StateHasChanged(); });
-                        
+
                 }
                 catch (Exception ex)
                 {
@@ -274,21 +295,65 @@
 
     }
 
+
+    protected override async void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            // Get a reference to the image element
+            _dotNetReference = DotNetObjectReference.Create(this);
+            _rotatingImage = await JSRuntime.InvokeAsync<IJSObjectReference>("document.getElementById", "rotating-image");
+
+        }
+    }
+
+
+
     public void Dispose()
     {
         stream?.Dispose();
     }
 
 
-    private void UpdateTargetViewModelOfEvent( ProtoIOEvent? ioEvent)
+
+
+
+
+    // UI events:
+
+    [JSInvokableAttribute("ioDeviceEmulator.Client")]
+    public void InformationWhenTransitionFinished()
+    {
+        Console.WriteLine("Transition finished.");
+
+        bool lastCommandIsTryToOpen = false;
+        lock(lockObj)
+        {
+            lastCommandIsTryToOpen = _lastCmdTryToOpen;            
+        }
+
+        if (lastCommandIsTryToOpen)
+            barrier.SetViewModelStateToOpen();
+        else
+            barrier.SetViewModelStateToClose();
+
+    }
+
+    private void UpdateBarrierTerminalStatus(bool toggled, int diIndex)
+    {
+        barrier.UpdateBarrierTerminal(diIndex, toggled);
+    }
+  
+    private void UpdateTargetViewModelOfEvent(ProtoIOEvent? ioEvent)
     {
         if (ioEvent?.IoType == (int)ioElementType.DigitalInput)
         {
-            var di =  digitalInpuuts?.Where(di => di.Index == ioEvent.Index).FirstOrDefault();
+            var di = digitalInpuuts?.Where(di => di.Index == ioEvent.Index).FirstOrDefault();
 
             if (di != null)
                 di.Activated = ioEvent.Status != 0 ? true : false;
-        } 
+        }
         else if (ioEvent?.IoType == (int)ioElementType.Relay)
         {
             var r = relays?.Where(r => r.Index == ioEvent.Index).FirstOrDefault();
@@ -303,23 +368,23 @@
         }
     }
 
-    private int SwitchedOnCount = 0;
     private async void UpdateDigitalInputStatus(bool toggled, int diIndex)
     {
-        OperationResponse 
+        OperationResponse
              response = await ProtoChangeDeviceIOStatusServiceClient.SetProtoIOStatusAsync(new SetIOStatusRequest()
-                {
-                    IoType = (int)ioElementType.DigitalInput,
-                    Index = diIndex,
-                    Status = toggled ? 1 : 0
-                });
+                 {
+                     IoType = (int)ioElementType.DigitalInput,
+                     Index = diIndex,
+                     Status = toggled ? 1 : 0
+                 });
 
         Console.WriteLine("here response ");
 
         if (response == null)
             return;
 
-        if (response.Success == false) {
+        if (response.Success == false)
+        {
 
             Console.WriteLine("success is false ");
 
@@ -342,26 +407,49 @@
 
 
             Snackbar.Add("Failed to change the digital input status.", Severity.Error);
-        } 
+        }
 
 
     }
-
+   
 
   
-
-
-    public void OnRotationChanged(object? sender, EventArgs e)
+    // VM events:
+    private void OnRotationOpenStarted(object? sender, EventArgs e)
     {
-        StateHasChanged();
+        Task.Run(RotateToOpen);
+    }
+    
+    private async Task RotateToOpen()
+    {
+        lock (lockObj)
+        {
+            _lastCmdTryToOpen = true;
+        }
+        /// JS code:
+        await _jsModule.InvokeAsync<object>("setImageRotation", _rotatingImage, -90, _dotNetReference);
+        /// JS code end.
     }
 
-    private void UpdateBarrierTerminalStatus(bool toggled, int diIndex)
+    private void OnRotationCloseStarted(object? sender, EventArgs e)
     {
-        barrier.UpdateBarrierTerminal(diIndex, toggled);
+        Task.Run(RotateToClose);
+    }
+    
+    private async Task RotateToClose()
+    {
+        lock (lockObj)
+        {
+            _lastCmdTryToOpen = false;
+        }
+        /// JS code:
+        await _jsModule.InvokeAsync<object>("setImageRotation", _rotatingImage, 0, _dotNetReference);
+        /// JS code end.
     }
 
 
+
+    // Aux:
     private static string ConvertIOTypeToString(int ioType)
     {
         return "Digital input";

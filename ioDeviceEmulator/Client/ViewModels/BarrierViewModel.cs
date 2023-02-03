@@ -1,7 +1,6 @@
 ﻿using ioDeviceEmulator.Client.Models;
 using System.Xml.Linq;
 using System;
-using ioDeviceEmulator.Client.Models;
 using ioDeviceEmulator.Client.Pages;
 
 namespace ioDeviceEmulator.Client.ViewModels
@@ -15,30 +14,14 @@ namespace ioDeviceEmulator.Client.ViewModels
         private const int _indexLoopDetector = 4;
 
         private readonly object _lock = new object();
-        private CancellationTokenSource _cts = new CancellationTokenSource();
 
-        private int _rotation = 0;
-        public int Rotation
-        {
-            get { return _rotation; }
-            set
-            {
-                lock (_lock)
-                {
-                    if (value >= 0 && value <= 90)
-                    {
-                        _rotation = value;
-                    }
-                }
-            }
-        }
-        public event EventHandler<EventArgs>? RotationChanged;
-        
+
         public IList<DigitalInputViewModel> BarrierTerminals { get; private set; }
 
         private Models.Barrier _barrier;
 
-
+        public event EventHandler<EventArgs>? RotatingOpenStarted;
+        public event EventHandler<EventArgs>? RotationCloseStarted;
 
         public BarrierViewModel( )
         {
@@ -102,76 +85,37 @@ namespace ioDeviceEmulator.Client.ViewModels
             }
         }
 
+        public void SetViewModelStateToOpen()
+        {
+            Console.WriteLine("model set to open called");
+            _barrier.SetStateToOpened();
+        }
 
+        public void SetViewModelStateToClose()
+        {
+            Console.WriteLine("model set to close called");
+            _barrier.SetStateToClosed();
+        }
 
         private void Barrier_StateChanged(object? sender, BarrierStateChangedEventArgs e)
         {
             if (e.NewState == BarrierState.Opening)
-                Task.Run(() => OpenBarrier());
+                OnRotationOpenStarted();
 
             else if (e.NewState == BarrierState.Closing)
-                Task.Run(() => CloseBarrier());
+                OnRotationCloseStarted();
         }
 
-        private  async Task OpenBarrier()
+        private void OnRotationOpenStarted()
         {
-            CancellationTokenSource cts;
-            lock (_lock)
-            {
-                _cts.Cancel();
-                _cts = cts = new CancellationTokenSource();
-            }
-
-            while (Rotation < 90)
-            {
-                if (cts.IsCancellationRequested)
-                    break;
-
-                Rotation += 1;
-                await Task.Delay(10, cts.Token);
-                OnRotationChanged();
-            }
-
-            if (!cts.IsCancellationRequested)
-                if (Rotation == 90)
-                    _barrier.SetStateToOpened();
-
+            RotatingOpenStarted?.Invoke(this, EventArgs.Empty);
         }
 
-        private async Task CloseBarrier()
+        private void OnRotationCloseStarted()
         {
-            CancellationTokenSource cts;
-            lock (_lock)
-            {
-                _cts.Cancel();
-                _cts = cts = new CancellationTokenSource();
-            }
-
-            while (Rotation > 0)
-            {
-                if (cts.IsCancellationRequested)
-                    break;
-
-                Rotation -= 1;
-                await Task.Delay(10, cts.Token);
-                OnRotationChanged();
-            }
-
-            if (!cts.IsCancellationRequested)
-                if (Rotation == 0)
-                    _barrier.SetStateToClosed();
+            RotationCloseStarted?.Invoke(this, EventArgs.Empty);
         }
 
-        //private Task PauseBarrier()
-        //{
-        //    _cts.Cancel();
-        //    return Task.CompletedTask;
-        //}
-
-        private void OnRotationChanged()
-        {
-            RotationChanged?.Invoke(this, EventArgs.Empty);
-        }
 
     }
 }
