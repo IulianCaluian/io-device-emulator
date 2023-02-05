@@ -377,9 +377,20 @@
         Console.WriteLine("di sel is " + diIndex);
 
 
+        RelayWiring? rw =  barrier.RelayWirings.Where(w => w.BarrierTerminalIndex == diIndex).FirstOrDefault();
+
+
+
+        int? currentRelayIndex = rw != null ? rw.RelayIndex : null;
+
+        var parameters = new DialogParameters();
+        parameters.Add("CurrentRelayIndex", currentRelayIndex);
+
         var options = new DialogOptions() { CloseOnEscapeKey = true };
 
-        var dialog = DialogService.Show<ChangeWiringDialog>("Simple Dialog", options);
+
+
+        var dialog = DialogService.Show<ChangeWiringDialog>("Simple Dialog", parameters, options);
 
         var result = await dialog.Result;
 
@@ -389,6 +400,24 @@
 
             int newRelay = (int)result.Data;
             Console.WriteLine("new relay is" + newRelay);
+
+            if (rw == null){
+                if (newRelay >= 0)
+                    barrier.RelayWirings.Add(new RelayWiring()
+                    {
+                        RelayIndex = newRelay,
+                        BarrierTerminalIndex = diIndex
+                    });
+            }
+            else
+            {
+                if (newRelay >= 0)
+                    rw.RelayIndex = newRelay;
+                else
+                    barrier.RelayWirings.Remove(rw);
+            }
+
+
         }
 
 

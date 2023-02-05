@@ -65,6 +65,10 @@ namespace ioDeviceEmulator.Client.ViewModels
                 }
             };
 
+            RelayWirings = new List<RelayWiring>()
+            {
+                new RelayWiring() { RelayIndex = 0, BarrierTerminalIndex = 0 }
+            };
         }
 
         public void UpdateBarrierTerminal(int terminalIndex, bool activated)
@@ -88,6 +92,12 @@ namespace ioDeviceEmulator.Client.ViewModels
 
         public void UpdateBarrierTerminalWiredToRelay(int relayNumber, bool activated)
         {
+            RelayWiring? rw = RelayWirings.Where(rw => rw.RelayIndex == relayNumber).FirstOrDefault();
+
+            if (rw != null)
+            {
+                UpdateBarrierTerminal(rw.BarrierTerminalIndex, activated);
+            }
 
         }
 

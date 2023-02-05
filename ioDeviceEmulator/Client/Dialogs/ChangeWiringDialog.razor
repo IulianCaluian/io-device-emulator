@@ -34,7 +34,7 @@
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
-
+    [Parameter] public int? CurrentRelayIndex { get; set; }
 
 
     public RelayWiringSelect RelayIndex { get; set; }
@@ -49,6 +49,8 @@
         {
             relayIndexes.Add(new RelayWiringSelect() { Name = $"Relay {i}", Number = i });
         }
+
+        RelayIndex = relayIndexes.Where(r => r.Number == CurrentRelayIndex).FirstOrDefault() ?? relayIndexes.First();
     }
 
     private void Cancel()
