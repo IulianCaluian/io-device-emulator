@@ -1,0 +1,87 @@
+﻿
+
+@using System.Collections.ObjectModel;
+
+
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            Change wiring
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+       
+        <MudSelect T="RelayWiringSelect" Label="Relay Index"
+                   @bind-Value="@RelayIndex" ToStringFunc="@converter" AnchorOrigin="Origin.BottomCenter" Style="width:80px">
+           
+            @foreach(var relayIndex in relayIndexes)
+            {
+                <MudSelectItem  Value="@relayIndex"></MudSelectItem>
+            }
+        </MudSelect>
+
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="SetWiringCommand">Set wiring</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+
+
+
+    public RelayWiringSelect RelayIndex { get; set; }
+    public IList<RelayWiringSelect> relayIndexes { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        relayIndexes = new List<RelayWiringSelect>();
+        relayIndexes.Add(new RelayWiringSelect() { Name = "No wiring", Number = -1 });
+        for (int i =0; i< 6; i++)
+        {
+            relayIndexes.Add(new RelayWiringSelect() { Name = $"Relay {i}", Number = i });
+        }
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void SetWiringCommand()
+    {
+        //In a real world scenario this bool would probably be a service to delete the item from api/database
+        Snackbar.Add("New wiring", Severity.Success);
+
+        MudDialog.Close(DialogResult.Ok(RelayIndex.Number));
+    }
+
+
+
+
+
+    public class RelayWiringSelect
+    {
+        public string? Name { get; set; }
+        public int Number { get; set; }
+
+        public override bool Equals(object? o)
+        {
+            var other = o as RelayWiringSelect;
+            return other?.Number == Number;
+        }
+
+        public override int GetHashCode() => Number;
+    }
+
+    Func<RelayWiringSelect, string?> converter = p => p?.Name;
+}
+

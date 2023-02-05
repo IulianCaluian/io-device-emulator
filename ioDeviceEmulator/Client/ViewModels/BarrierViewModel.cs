@@ -17,6 +17,7 @@ namespace ioDeviceEmulator.Client.ViewModels
 
 
         public IList<DigitalInputViewModel> BarrierTerminals { get; private set; }
+        public IList<RelayWiring> RelayWirings { get; private set; }
 
         private Models.Barrier _barrier;
 
@@ -85,6 +86,15 @@ namespace ioDeviceEmulator.Client.ViewModels
             }
         }
 
+        public void UpdateBarrierTerminalWiredToRelay(int relayNumber, bool activated)
+        {
+
+        }
+
+
+
+
+
         public void SetViewModelStateToOpen()
         {
             Console.WriteLine("model set to open called");
@@ -117,5 +127,13 @@ namespace ioDeviceEmulator.Client.ViewModels
         }
 
 
+
+    }
+
+
+    public class RelayWiring
+    {
+        public int RelayIndex { get; set; }
+        public int BarrierTerminalIndex { get; set; }
     }
 }
