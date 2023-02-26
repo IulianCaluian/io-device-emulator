@@ -1,3 +1,4 @@
+using ioDeviceEmulator.Server.BackgroundServices;
 using ioDeviceEmulator.Server.GrpcServices;
 using ioDeviceEmulator.Server.Repo;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -22,6 +23,9 @@ internal class Program
         builder.Services.AddSingleton<DeviceState>();
         builder.Services.AddSingleton<DeviceStateService>();
         builder.Services.AddSingleton<IOEventsStreamService>();
+
+        builder.Services.AddHostedService<PeriodicDeviceStateChanger>();
+
         builder.Services.AddControllers().AddNewtonsoftJson();
 
         var app = builder.Build();

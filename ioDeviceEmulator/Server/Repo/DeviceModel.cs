@@ -89,6 +89,8 @@ namespace ioDeviceEmulator.Server.Repo
         public int CounterOverflowClear { get; set; }
         public int CounterStatus { get; set; }
 
+        public int Activated { get; set; }
+
         public DigitalInputCounter()
         {
             Mode = 1;
@@ -177,6 +179,8 @@ namespace ioDeviceEmulator.Server.Repo
         public int TotalCount { get; set; }
         public int CurrentCount { get; set; }
         public int CurrentCountReset { get; set; }
+
+        public int Activated { get; set; }
 
         public override object ToJsonObject()
         {

@@ -25,13 +25,13 @@ message ProtoDeviceStateResponse {
 }
 
 message ProtoRelay {
-	int32 index = 2;
-	int32 status = 3;
+	int32 index = 1;
+    int32 activated = 2;
 }
 
 message ProtoDigitalInput {
-	int32 index = 2;
-	int32 status = 3;
+	int32 index = 1;
+    int32 activated = 2;
 }
 
 message ProtoIOEvent {

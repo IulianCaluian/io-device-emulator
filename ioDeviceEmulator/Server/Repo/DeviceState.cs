@@ -1,4 +1,6 @@
-﻿namespace ioDeviceEmulator.Server.Repo
+﻿using ioDeviceEmulator.Server.Controllers;
+
+namespace ioDeviceEmulator.Server.Repo
 {
     public class DeviceState
     {
@@ -50,7 +52,7 @@
             return false;
         }
 
-        internal bool SetRelay(int index, int status)
+        internal bool SetRelayStatus(int index, int status)
         {
             Relay? relay = _device.Relays.Where(x => x.Index == index).FirstOrDefault();
 
@@ -62,11 +64,19 @@
                 var di = (RelayRelay)relay;
                 di.Status = status;
                 return true;
+            } 
+            else
+            {
+                //TODO Start pulsing
             }
 
             return false;
         }
-     
+
+        internal bool UpdateRelays(IEnumerable<restRelayChannel> listRelays)
+        {
+            throw new NotImplementedException();
+        }
 
         private void SetDigitalInputDI(DigitalInput input, int status)
         {

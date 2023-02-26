@@ -250,7 +250,7 @@
                 {
                     Index = pdi.Index,
                     Name = $"Digital input {pdi.Index}",
-                    Activated = pdi.Status != 0 ? true : false
+                    Activated = pdi.Activated != 0 ? true : false
                 });
 
 
@@ -261,7 +261,7 @@
                 {
                     Index = pr.Index,
                     Name = $"Relay {pr.Index}",
-                    Activated = pr.Status != 0 ? true : false
+                    Activated = pr.Activated != 0 ? true : false
                 });
 
 

@@ -32,22 +32,41 @@ namespace ioDeviceEmulator.Server.GrpcServices
         {
             var dis = _deviceState.GetDigitalInputs();
 
-            return dis.Select(di => new ProtoDigitalInput
+            return dis.Select(di =>
+            di.Mode == 0 ?
+            new ProtoDigitalInput
             {
                 Index = di.Index,
-                Status = ((DigitalInputDI)di).Status
-            }); 
+                Activated = ((DigitalInputDI)di).Status
+            }
+            :
+            new ProtoDigitalInput
+            {
+                Index = di.Index,
+                Activated = ((DigitalInputCounter)di).Activated,
+            }
+            ); 
         }
 
         public IEnumerable<ProtoRelay> GetProtoRelays()
         {
             var rs = _deviceState.GetRelays();
 
-            return rs.Select(r => new ProtoRelay
+            return rs.Select(r =>
+            r.Mode == 0 ?          
+            new ProtoRelay
             {
                 Index = r.Index,
-                Status = ((RelayRelay)r).Status
-            });
+                Activated = ((RelayRelay)r).Status
+            }
+            :
+            new ProtoRelay
+            {
+                Index = r.Index,    
+                Activated = ((RelayPulse)r).Activated
+            }
+            
+            );
         }
     }
 }
