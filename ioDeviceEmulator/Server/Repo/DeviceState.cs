@@ -1,13 +1,17 @@
-﻿using ioDeviceEmulator.Server.Controllers;
+﻿using ioDeviceEmulator.Server.BackgroundServices;
+using ioDeviceEmulator.Server.Controllers;
 
 namespace ioDeviceEmulator.Server.Repo
 {
     public class DeviceState
     {
         private DeviceModel _device;
-        public DeviceState()
+
+        public event EventHandler<EventArgs>? RelayPuslingStatusChanged;
+     
+        public DeviceState(DeviceModel deviceModel)
         {
-            _device = DeviceModel.E1214();
+            _device = deviceModel;
         }
 
         public List<DigitalInput> GetDigitalInputs()
@@ -61,16 +65,30 @@ namespace ioDeviceEmulator.Server.Repo
 
             if (relay.Mode == 0)
             {
-                var di = (RelayRelay)relay;
-                di.Status = status;
+                var relRel = (RelayRelay)relay;
+                relRel.Status = status;
                 return true;
             } 
             else
             {
-                //TODO Start pulsing
+                var relPuls = (RelayPulse)relay;
+                relPuls.PulseStatus = status;
+                OnRelayPuslingStatusChanged();
+                // _periodicDeviceStateChanger.SetRelayPulsingState(relPuls.Index, relPuls.PulseStatus);
+                //TODO Start pulsing + get events back on stop pulsing.
             }
 
             return false;
+        }
+
+        private void OnRelayPuslingStatusChanged()
+        {
+            RelayPuslingStatusChanged?.Invoke(this, new EventArgs());
+        }
+
+        public void RelayPulsingEnded(int index)
+        {
+
         }
 
         internal bool UpdateRelays(IEnumerable<restRelayChannel> listRelays)

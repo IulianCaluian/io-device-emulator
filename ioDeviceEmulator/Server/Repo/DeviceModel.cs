@@ -9,17 +9,22 @@ namespace ioDeviceEmulator.Server.Repo
     {
         public List<DigitalInput> DigitalInputs { get; private set; }
         public List<Relay> Relays { get; private set; }
-        private DeviceModel() {
 
+        public DeviceModel()
+        {
             DigitalInputs = new List<DigitalInput>();
-            Relays = new List<Relay>(); 
+            Relays = new List<Relay>();
+
+            Initialize_As_E1214();
         }
 
-        public static DeviceModel E1214()
-        {
-            DeviceModel deviceState = new DeviceModel();
+     
 
-            deviceState.DigitalInputs = new List<DigitalInput>
+        public void Initialize_As_E1214()
+        {
+            
+
+            DigitalInputs = new List<DigitalInput>
             {
                 new DigitalInputDI() { Index = 0 },
                 new DigitalInputDI() { Index = 1 },
@@ -29,7 +34,7 @@ namespace ioDeviceEmulator.Server.Repo
                 new DigitalInputCounter() { Index = 5 }
             };
 
-            deviceState.Relays = new List<Relay>
+            Relays = new List<Relay>
             {
                 new RelayPulse() { Index = 0 },
                 new RelayPulse() { Index = 1 },
@@ -38,8 +43,11 @@ namespace ioDeviceEmulator.Server.Repo
                 new RelayRelay() { Index = 4 },
                 new RelayPulse() { Index = 5 }
             };
+        }
 
-            return deviceState;
+        internal List<Relay> GetRelays()
+        {
+            return Relays;
         }
     }
 

@@ -20,6 +20,7 @@ internal class Program
             opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
                 new[] { "application/octet-stream" });
         });
+        builder.Services.AddSingleton<DeviceModel>();
         builder.Services.AddSingleton<DeviceState>();
         builder.Services.AddSingleton<DeviceStateService>();
         builder.Services.AddSingleton<IOEventsStreamService>();
