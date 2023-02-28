@@ -5,6 +5,7 @@ using ioDeviceEmulator.Server.Events;
 using ioDeviceEmulator.Server.GrpcServices;
 using ioDeviceEmulator.Shared;
 using MudBlazor;
+using System.ComponentModel;
 
 namespace ioDeviceEmulator.Server.Repo
 {
@@ -82,10 +83,15 @@ namespace ioDeviceEmulator.Server.Repo
             return false;
         }
 
+
+        public void PulseRelayStatusActivation(int index, bool activated)
+        {
+            GenerateEvent(ioElementType.Relay, index, (activated?1:0), "Relay changed from pulsing task.");
+        }
+
+
         public bool UpdateRelays(IEnumerable<Relay> listRelays)
         {
-            // TODO.
-
             // var rStatuses = string.Join("|", listRelays.Select(x => $"{x.relayIndex}:{(x.relayMode == 0 ? x.relayStatus : x.relayPulseStatus)}"));
             string relaysStatuses = string.Empty;
 

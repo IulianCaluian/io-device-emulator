@@ -36,8 +36,8 @@ namespace ioDeviceEmulator.Server.Repo
 
             Relays = new List<Relay>
             {
-                new RelayPulse() { Index = 0 , PulseStatus = 1, PulseOnWidth = 3, PulseOffWidth = 5, TotalCount = 3},
-                new RelayPulse() { Index = 1, PulseStatus = 1, PulseOnWidth = 1, PulseOffWidth = 1, TotalCount = 5},
+                new RelayPulse() { Index = 0 , PulseStatus = 1, PulseOnWidth = 3, PulseOffWidth = 9, TotalCount = 300},
+                new RelayPulse() { Index = 1, PulseStatus = 1, PulseOnWidth = 1, PulseOffWidth = 1, TotalCount = 500},
                 new RelayRelay() { Index = 2 },
                 new RelayRelay() { Index = 3 },
                 new RelayRelay() { Index = 4 },

@@ -32,8 +32,6 @@ namespace ioDeviceEmulator.Server.Controllers
 
             if (opResult)
             {
-            
-
                 return Ok();
             }
             else
@@ -80,7 +78,7 @@ namespace ioDeviceEmulator.Server.Controllers
 
         [HttpPut]
         [Route("relay/open/{index}")]
-        public IActionResult OpenRelay(int index, string eventDescription)
+        public IActionResult OpenRelay(int index)
         {
             // Perform some action to activate the input with the specified index
             bool opResuult = _deviceState.SetRelayStatus(index, 0, "Simulator API open relay");

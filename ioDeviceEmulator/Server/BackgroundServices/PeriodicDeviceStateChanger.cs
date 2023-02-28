@@ -46,7 +46,7 @@ namespace ioDeviceEmulator.Server.BackgroundServices
 
                         _pulsingTasks.Add(rel.Index, new PulsingTask(rel.Index,
                             new PulsingSettings(rp.PulseOnWidth, rp.PulseOffWidth, rp.TotalCount),
-                            ChangeOfActivatedState, ChangeOfPulsingState));
+                             ChangeOfPulsingState, ChangeOfActivatedState));
                     }
                 }
                 _canReceiveCommands = true;
@@ -93,6 +93,7 @@ namespace ioDeviceEmulator.Server.BackgroundServices
         private void ChangeOfActivatedState(int index, bool activated)
         {
             Debug.WriteLine($"Change of activated state index:{index} => activ:{activated}");
+            _deviceState.PulseRelayStatusActivation(index, activated);
         }
 
         private void ChangeOfPulsingState(int index, bool pulsing)
