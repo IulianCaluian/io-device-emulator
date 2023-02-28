@@ -79,6 +79,7 @@ namespace ioDeviceEmulator.Server.BackgroundServices
 
         public void SetRelayPulsingState(int relayIndex, int state)
         {
+            Debug.WriteLine($"Received command to change pulsing state on index {relayIndex} to {state}");
             lock(_pulsingTasks)
             {
                 if (_canReceiveCommands == false) return;

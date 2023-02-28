@@ -54,6 +54,7 @@ namespace ioDeviceEmulator.Server.BackgroundServices
         {
             int onWdth = 2;
             int offWidth = 2;
+
             lock (dataLock)
             {
                 onWdth = _timeOnWidthInSec;
@@ -65,7 +66,6 @@ namespace ioDeviceEmulator.Server.BackgroundServices
                 if (_pulsingState == 1 && pulsingState == 1)
                     return;
             }
-
 
             if (pulsingState == 1)
             {
@@ -85,6 +85,11 @@ namespace ioDeviceEmulator.Server.BackgroundServices
 
         private async Task Iterate(int onWidth, int offWidth, CancellationToken ct)
         {
+            lock (dataLock)
+            {
+                _pulsingState = 1;
+            }
+
             try
             {
                 while (true)
@@ -118,7 +123,11 @@ namespace ioDeviceEmulator.Server.BackgroundServices
                 Debug.WriteLine("Iterate ended");
             }
 
-            _pulsingState = 0;
+            lock (dataLock)
+            {
+                _pulsingState = 0;
+            }
+
             _changeOfRelayStatus(_index, false);
             _changeOfPulsingState(_index, false);
 

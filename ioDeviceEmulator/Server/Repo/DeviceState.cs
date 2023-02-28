@@ -79,8 +79,6 @@ namespace ioDeviceEmulator.Server.Repo
                 // _periodicDeviceStateChanger.SetRelayPulsingState(relPuls.Index, relPuls.PulseStatus);
                 //TODO Start pulsing + get events back on stop pulsing.
             }
-
-            return false;
         }
 
 
