@@ -1,4 +1,5 @@
 ﻿
+using Grpc.Core;
 using ioDeviceEmulator.Server.GrpcServices;
 using ioDeviceEmulator.Server.Repo;
 using ioDeviceEmulator.Shared;
@@ -12,7 +13,9 @@ namespace ioDeviceEmulator.Server.Controllers
     public class MoxaInternalsSimulator : ControllerBase
     {
         DeviceState _deviceState;
-        private readonly IOEventsStreamService _ioEventsStreamService;
+        IOEventsStreamService _ioEventsStreamService;
+
+
 
         public MoxaInternalsSimulator(DeviceState deviceState, IOEventsStreamService ioEventsStreamService)
         {
@@ -25,18 +28,11 @@ namespace ioDeviceEmulator.Server.Controllers
         public IActionResult CloseInput(int index)
         {
             // Perform some action to activate the input with the specified index
-            bool opResult = _deviceState.CloseInput(index);
+            bool opResult = _deviceState.SetInputStatus(index, 1, "Simulator API closed digital input");
 
             if (opResult)
             {
-                _ioEventsStreamService.EventSubject.OnNext(new Models.IOEvent()
-                {
-                    EventDate = DateTime.Now,
-                    IOType = ioElementType.DigitalInput,
-                    Index = index,
-                    Status = 1,
-                    Summary = "Simulator API close digital input"
-                });
+            
 
                 return Ok();
             }
@@ -52,19 +48,10 @@ namespace ioDeviceEmulator.Server.Controllers
         public IActionResult OpenInput(int index)
         {
             // Perform some action to activate the input with the specified index
-            bool opResuult = _deviceState.OpenInput(index);
+            bool opResuult = _deviceState.SetInputStatus(index, 0, "Simulator API open digital input");
 
             if (opResuult)
             {
-                _ioEventsStreamService.EventSubject.OnNext(new Models.IOEvent()
-                {
-                     EventDate = DateTime.Now,
-                     IOType = ioElementType.DigitalInput,
-                     Index = index,
-                     Status = 0,
-                     Summary = "Simulator API open digital input"
-                });
-
                 return Ok();
             }
             else
@@ -78,19 +65,10 @@ namespace ioDeviceEmulator.Server.Controllers
         public IActionResult CloseRelay(int index)
         {
             // Perform some action to activate the input with the specified index
-            bool opResult = _deviceState.CloseInput(index);
+            bool opResult = _deviceState.SetRelayStatus(index, 1, "Simulator API close relay");
 
             if (opResult)
             {
-                _ioEventsStreamService.EventSubject.OnNext(new Models.IOEvent()
-                {
-                    EventDate = DateTime.Now,
-                    IOType = ioElementType.Relay,
-                    Index = index,
-                    Status = 1,
-                    Summary = "Simulator API close relay"
-                });
-
                 return Ok();
             }
             else
@@ -102,22 +80,13 @@ namespace ioDeviceEmulator.Server.Controllers
 
         [HttpPut]
         [Route("relay/open/{index}")]
-        public IActionResult OpenRelay(int index)
+        public IActionResult OpenRelay(int index, string eventDescription)
         {
             // Perform some action to activate the input with the specified index
-            bool opResuult = _deviceState.OpenInput(index);
+            bool opResuult = _deviceState.SetRelayStatus(index, 0, "Simulator API open relay");
 
             if (opResuult)
             {
-                _ioEventsStreamService.EventSubject.OnNext(new Models.IOEvent()
-                {
-                    EventDate = DateTime.Now,
-                    IOType = ioElementType.Relay,
-                    Index = index,
-                    Status = 0,
-                    Summary = "Simulator API open relay"
-                });
-
                 return Ok();
             }
             else

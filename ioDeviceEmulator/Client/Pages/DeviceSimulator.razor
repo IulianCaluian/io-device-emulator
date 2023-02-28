@@ -195,7 +195,7 @@
                                 <td>@ioEvent.Date.ToLongTimeString()</td>
                                 <td>@ConvertIOTypeToString(ioEvent.IoType)</td>
                                 <td>@ioEvent.Index</td>
-                                <td>@ioEvent.Status</td>
+                                <td>@ioEvent.Activated</td>
                                 <td>@ioEvent.Summary</td>
                             </tr>
                         }
@@ -357,7 +357,7 @@
             var di = digitalInpuuts?.Where(di => di.Index == ioEvent.Index).FirstOrDefault();
 
             if (di != null)
-                di.Activated = ioEvent.Status != 0 ? true : false;
+                di.Activated = ioEvent.Activated != 0 ? true : false;
         }
         else if (ioEvent?.IoType == (int)ioElementType.Relay)
         {
@@ -365,7 +365,7 @@
 
             if (r != null)
             {
-                r.Activated = ioEvent.Status != 0 ? true : false;
+                r.Activated = ioEvent.Activated != 0 ? true : false;
 
                 barrier.UpdateBarrierTerminalWiredToRelay(r.Index, r.Activated);
             }

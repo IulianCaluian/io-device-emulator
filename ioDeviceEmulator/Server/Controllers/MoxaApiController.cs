@@ -17,12 +17,9 @@ namespace ioDeviceEmulator.Server.Controllers
     {
         DeviceState _deviceState;
 
-
-        private readonly IOEventsStreamService _ioEventsStreamService;
         public MoxaApiController(DeviceState deviceState, IOEventsStreamService ioEventsStreamService)
         {
             _deviceState = deviceState;
-            _ioEventsStreamService = ioEventsStreamService;
         }
 
         [HttpGet]
@@ -184,43 +181,28 @@ namespace ioDeviceEmulator.Server.Controllers
 
         private bool UpdateRelayStatus(int index, int status)
         {
-
-            bool opResuult = _deviceState.SetRelayStatus(index, status);
-
-            if (opResuult)
-            {
-                _ioEventsStreamService.EventSubject.OnNext(new Models.IOEvent()
-                {
-                    EventDate = DateTime.Now,
-                    IOType = ioElementType.Relay,
-                    Index = index,
-                    Status = status,
-                    Summary = status == 0 ? "Simulator API open/OFF relay" : "Simulator API close/ON relay"
-                });
-            }
-
-            return opResuult;
+            return _deviceState.SetRelayStatus(index, status, "");
         }
 
         private bool UpdateRelays(IEnumerable<restRelayChannel> listRelays)
         {
-            bool opResuult = _deviceState.UpdateRelays(listRelays);
+            List<Relay> listRels = new List<Relay>();
 
-            var rStatuses = string.Join("|", listRelays.Select(x => $"{x.relayIndex}:{(x.relayMode == 0 ? x.relayStatus : x.relayPulseStatus)}"));
-
-            if (opResuult)
+            foreach (var relay in listRelays)
             {
-                _ioEventsStreamService.EventSubject.OnNext(new Models.IOEvent()
+                if (relay.relayMode == 0)
                 {
-                    EventDate = DateTime.Now,
-                    IOType = ioElementType.Relay,
-                    Index = -1,
-                    Status = -1,
-                    Summary = $"Update all relays to: {rStatuses}"
-                }); 
-            }
+                    listRels.Add( relay.GetRelayRelay());
 
-            return opResuult;
+                } 
+                else
+                {
+                    listRels.Add(relay.GetRelayPulse());
+                }
+            }
+            //TODO extract groups
+
+            return _deviceState.UpdateRelays(listRels);
         }
 
 
@@ -244,6 +226,32 @@ namespace ioDeviceEmulator.Server.Controllers
         public uint relayPulseCount { get; set; }
         public uint relayPulseOnWidth { get; set; }
         public uint relayPulseOffWidth { get; set; }
+
+        internal RelayRelay GetRelayRelay()
+        {
+            return new RelayRelay()
+            {
+                Status = (int)relayStatus,
+                TotalCount = (int)relayTotalCount,
+                CurrentCount = (int)relayCurrentCount,
+                CurrentCountReset = (int)relayCurrentCountReset,
+            };
+        }
+
+        internal RelayPulse GetRelayPulse()
+        {
+            return new RelayPulse()
+            {
+                TotalCount = (int)relayTotalCount,
+                CurrentCount = (int)relayCurrentCount,
+                CurrentCountReset = (int)relayCurrentCountReset,
+
+                PulseStatus = (int)relayPulseStatus,
+                PulseCount = (int)relayPulseCount,
+                PulseOnWidth = (int)relayPulseOnWidth,
+                PulseOffWidth = (int)relayPulseOffWidth
+            };
+        }
 
         //public RelayChannel GetDomainModel()
         //{

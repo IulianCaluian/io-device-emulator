@@ -38,7 +38,7 @@ message ProtoIOEvent {
 	google.protobuf.Timestamp dateTimeStamp = 1;
 	int32 ioType = 2;
 	int32 index = 3;
-	int32 status = 4;
+	int32 activated = 4;
 	string summary = 5;
 }
 

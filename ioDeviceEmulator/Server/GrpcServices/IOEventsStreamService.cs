@@ -32,7 +32,7 @@ namespace ioDeviceEmulator.Server.GrpcServices
                     Date = ioEvent.EventDate,
                     IoType = (int)ioEvent.IOType,
                     Index = ioEvent.Index,
-                    Status = ioEvent.Status,
+                    Activated = ioEvent.Status,
                     Summary = ioEvent.Summary
                 };
 

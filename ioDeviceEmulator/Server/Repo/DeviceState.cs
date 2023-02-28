@@ -1,17 +1,24 @@
-﻿using ioDeviceEmulator.Server.BackgroundServices;
+﻿using Grpc.Core;
+using ioDeviceEmulator.Server.BackgroundServices;
 using ioDeviceEmulator.Server.Controllers;
+using ioDeviceEmulator.Server.Events;
+using ioDeviceEmulator.Server.GrpcServices;
+using ioDeviceEmulator.Shared;
+using MudBlazor;
 
 namespace ioDeviceEmulator.Server.Repo
 {
     public class DeviceState
     {
         private DeviceModel _device;
+        private readonly IOEventsStreamService _ioEventsStreamService;
 
-        public event EventHandler<EventArgs>? RelayPuslingStatusChanged;
+        public event EventHandler<PulseStatusChangedEventArgs>? RelayPuslingStatusChanged;
      
-        public DeviceState(DeviceModel deviceModel)
+        public DeviceState(DeviceModel deviceModel, IOEventsStreamService ioEventsStreamService)
         {
             _device = deviceModel;
+            _ioEventsStreamService = ioEventsStreamService;
         }
 
         public List<DigitalInput> GetDigitalInputs()
@@ -24,7 +31,8 @@ namespace ioDeviceEmulator.Server.Repo
             return _device.Relays;
         }
 
-        internal bool CloseInput(int index)
+        #region Public interface
+        public bool SetInputStatus(int index, int inputStatus, string eventDescription)
         {
             DigitalInput? input = _device.DigitalInputs.Where(x => x.Index == index).FirstOrDefault();
 
@@ -33,30 +41,20 @@ namespace ioDeviceEmulator.Server.Repo
 
             if (input.Mode == 0)
             {
-                SetDigitalInputDI(input, 1);
+                var di = (DigitalInputDI)input;
+                di.Status = inputStatus;
+                GenerateEvent(ioElementType.DigitalInput, index, inputStatus, eventDescription);
                 return true;
-            }
-
-            return false;
-        }
-
-        internal bool OpenInput(int index)
-        {
-           DigitalInput? input =  _device.DigitalInputs.Where(x => x.Index == index).FirstOrDefault();
-
-            if (input == null)
-                return false;
-
-            if (input.Mode == 0)
+            } 
+            else if (input.Mode == 1) 
             {
-                SetDigitalInputDI(input, 0);
-                return true;
+                // TODO.
             }
 
             return false;
         }
 
-        internal bool SetRelayStatus(int index, int status)
+        public bool SetRelayStatus(int index, int status, string eventDescription)
         {
             Relay? relay = _device.Relays.Where(x => x.Index == index).FirstOrDefault();
 
@@ -67,13 +65,16 @@ namespace ioDeviceEmulator.Server.Repo
             {
                 var relRel = (RelayRelay)relay;
                 relRel.Status = status;
+                GenerateEvent(ioElementType.Relay, index, status, eventDescription);
                 return true;
             } 
             else
             {
                 var relPuls = (RelayPulse)relay;
                 relPuls.PulseStatus = status;
-                OnRelayPuslingStatusChanged();
+                OnRelayPuslingStatusChanged(relPuls.Index, relPuls.PulseStatus);
+                GenerateEvent(ioElementType.Relay, -1, -1, eventDescription);
+                return true;
                 // _periodicDeviceStateChanger.SetRelayPulsingState(relPuls.Index, relPuls.PulseStatus);
                 //TODO Start pulsing + get events back on stop pulsing.
             }
@@ -81,25 +82,41 @@ namespace ioDeviceEmulator.Server.Repo
             return false;
         }
 
-        private void OnRelayPuslingStatusChanged()
+        public bool UpdateRelays(IEnumerable<Relay> listRelays)
         {
-            RelayPuslingStatusChanged?.Invoke(this, new EventArgs());
-        }
+            // TODO.
 
-        public void RelayPulsingEnded(int index)
-        {
+            // var rStatuses = string.Join("|", listRelays.Select(x => $"{x.relayIndex}:{(x.relayMode == 0 ? x.relayStatus : x.relayPulseStatus)}"));
+            string relaysStatuses = string.Empty;
 
-        }
+            var description = $"Update all relays to: {relaysStatuses}";
+            GenerateEvent(ioElementType.Relay, -1, -1, description);
 
-        internal bool UpdateRelays(IEnumerable<restRelayChannel> listRelays)
-        {
             throw new NotImplementedException();
         }
+        #endregion
 
-        private void SetDigitalInputDI(DigitalInput input, int status)
+
+
+
+
+
+        private void OnRelayPuslingStatusChanged(int index, int status)
         {
-            var di = (DigitalInputDI)input;
-            di.Status = status;
+            RelayPuslingStatusChanged?.Invoke(this, new PulseStatusChangedEventArgs(index, status));
         }
+
+        private void GenerateEvent(ioElementType elementType, int index, int status, string description)
+        {
+            _ioEventsStreamService.EventSubject.OnNext(new Models.IOEvent()
+            {
+                EventDate = DateTime.Now,
+                IOType = elementType,
+                Index = index,
+                Status = status,
+                Summary = description
+            });
+        }
+
     }
 }
