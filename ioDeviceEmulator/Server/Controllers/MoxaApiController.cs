@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 
@@ -161,15 +162,11 @@ namespace ioDeviceEmulator.Server.Controllers
             if (parsedList != null)
                 listRelay = parsedList;
 
-            
-
-
 
             bool op = UpdateRelays(listRelay);
 
             if (op)
             {
-
                 return Ok();
             }
             else
@@ -184,22 +181,24 @@ namespace ioDeviceEmulator.Server.Controllers
             return _deviceState.SetRelayStatus(index, status, "");
         }
 
-        private bool UpdateRelays(IEnumerable<restRelayChannel> listRelays)
+        private bool UpdateRelays(IEnumerable<restRelayChannel> restRelayList)
         {
             List<Relay> listRels = new List<Relay>();
 
-            foreach (var relay in listRelays)
+            foreach (var restRelay in restRelayList)
             {
-                if (relay.relayMode == 0)
+                if (restRelay.relayMode == 0)
                 {
-                    listRels.Add( relay.GetRelayRelay());
+                    listRels.Add( restRelay.GetRelayRelay());
 
                 } 
                 else
                 {
-                    listRels.Add(relay.GetRelayPulse());
+                    listRels.Add(restRelay.GetRelayPulse());
                 }
             }
+
+
             //TODO extract groups
 
             return _deviceState.UpdateRelays(listRels);
@@ -231,6 +230,8 @@ namespace ioDeviceEmulator.Server.Controllers
         {
             return new RelayRelay()
             {
+                Index = (int)relayIndex,
+
                 Status = (int)relayStatus,
                 TotalCount = (int)relayTotalCount,
                 CurrentCount = (int)relayCurrentCount,
@@ -242,6 +243,8 @@ namespace ioDeviceEmulator.Server.Controllers
         {
             return new RelayPulse()
             {
+                Index = (int)relayIndex,
+
                 TotalCount = (int)relayTotalCount,
                 CurrentCount = (int)relayCurrentCount,
                 CurrentCountReset = (int)relayCurrentCountReset,

@@ -96,7 +96,20 @@ namespace ioDeviceEmulator.Server.Repo
             var description = $"Update all relays to: {relaysStatuses}";
             GenerateEvent(ioElementType.Relay, -1, -1, description);
 
-            throw new NotImplementedException();
+           foreach(var rel in listRelays)
+            {
+                if (rel.Mode == 0)
+                {
+                    RelayRelay rr = (RelayRelay)rel;
+                    SetRelayStatus(rel.Index, rr.Status, $"Simulator API group-change relay rr {rel.Index} | {rr.Status}");
+                } 
+                else
+                {
+                    RelayPulse rp = (RelayPulse)rel;
+                    SetRelayStatus(rel.Index, rp.PulseStatus, $"Simulator API group-change relay {rel.Index} | {rp.PulseStatus}");
+                }
+            }
+            return true;
         }
         #endregion
 
