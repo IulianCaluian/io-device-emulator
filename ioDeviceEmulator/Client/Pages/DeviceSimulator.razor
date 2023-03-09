@@ -170,7 +170,14 @@
 
         <MudPaper Class="pa-8 ma-2" Elevation="4">
 
-            <h3>IO Events</h3>
+            <MudStack Row="true" Class="d-flex align-center">
+                <h3 Class="d-flex align-center" style="margin-bottom:0px">IO Events </h3>
+
+            <MudToggleIconButton @bind-Toggled="@CollectEvents"
+                Icon="@Icons.Material.Filled.PlayArrow" Color="@Color.Success"   Title="Off"
+                ToggledIcon="@Icons.Material.Filled.Pause" ToggledColor="@Color.Error" ToggledTitle="On" />
+
+            </MudStack>
 
             @if (ioEvents == null)
             {
@@ -181,6 +188,7 @@
                 <table class="table">
                     <thead>
                         <tr>
+                            <th>Events count</th>
                             <th>Date</th>
                             <th>IO Type</th>
                             <th>Index</th>
@@ -192,6 +200,11 @@
                         @foreach (var ioEvent in ioEvents)
                         {
                             <tr>
+                                <td>
+                                   @if(ioEvent.Count > 1) {
+                                     <MudChip Size="Size.Small">@ioEvent.Count</MudChip>
+                                   }
+                                </td>
                                 <td>@ioEvent.Date.ToLongTimeString()</td>
                                 <td>@ConvertIOTypeToString(ioEvent.IoType)</td>
                                 <td>@ioEvent.Index</td>
@@ -215,9 +228,10 @@
     private IList<RelayViewModel>? relays;
     private BarrierViewModel barrier;
 
-    private IList<ProtoIOEvent> ioEvents = new List<ProtoIOEvent>();
+    private IList<ProtoIOEventWithCount> ioEvents = new List<ProtoIOEventWithCount>();
     private AsyncServerStreamingCall<ProtoIOEvent>? stream;
 
+    public bool CollectEvents { get; set; } = true;
 
     private bool _lastCmdTryToOpen;
     public readonly object lockObj = new object();
@@ -279,14 +293,39 @@
 
                     ProtoIOEvent? protoEvent = stream.ResponseStream.Current;
 
-                    // Add in events list:
-                    ioEvents.Add(protoEvent);
+                    if (CollectEvents == true)
+                    {
+                        // Add in events list:
+                        ProtoIOEventWithCount evWithCount = ProtoIOEventWithCount.GetProtoIOEventWithCount(protoEvent);
+                        ProtoIOEventWithCount? existingEvent = null;
+                        for (int i = ioEvents.Count - 1; i >= Math.Max(0, ioEvents.Count - 19); i--)
+                        {
+                            if (ioEvents[i].Equals(evWithCount))
+                            {
+                                existingEvent = ioEvents[i];
+                                existingEvent.Count++;
+                                existingEvent.Date = evWithCount.Date;
+                                break;
+                            }
+                        }
+
+                        if (existingEvent == null)
+                        {
+                            ioEvents.Add(evWithCount);
+                        }
+
+                    }
+
+                    // ioEvents.Add();
+
+                    //  protoEvent.IoType
 
                     // Update element:
                     UpdateTargetViewModelOfEvent(protoEvent);
 
                     await InvokeAsync(() => { this.StateHasChanged(); });
 
+                   
                 }
                 catch (Exception ex)
                 {
@@ -510,5 +549,45 @@
         return "Digital input";
     }
 
+
+    private class ProtoIOEventWithCount 
+    {
+        public int Count { get; set; }
+        public DateTime Date { get; set; }
+        public int IoType { get; set; }
+
+        public int Index { get; set; }
+        public int Activated { get; set; }
+        public string Summary { get; set; }
+
+
+        public static   ProtoIOEventWithCount GetProtoIOEventWithCount(ProtoIOEvent protoEvent)
+        {
+
+            ProtoIOEventWithCount ev = new ProtoIOEventWithCount();
+
+            ev.Count = 1;
+            ev.Date = protoEvent.Date;
+            ev.IoType = protoEvent.IoType;
+
+            ev.Index = protoEvent.Index;
+            ev.Activated = protoEvent.Activated;
+            ev.Summary = protoEvent.Summary;
+
+            return ev;
+
+        }
+
+        public bool Equals(ProtoIOEventWithCount evCompared)
+        {
+            if (evCompared.IoType == IoType && 
+           evCompared.Index == Index &&
+             evCompared.Activated == Activated &&
+             evCompared.Summary.Equals(Summary))
+         return true;
+
+            return false;
+        }
+    }
 
 }

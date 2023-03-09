@@ -1,0 +1,48 @@
+[33m6ed4ab9[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m)[m Fixing relays update from api bug
+[33m6955f6f[m[33m ([m[1;31morigin/master[m[33m)[m Fixing pulsing state bug
+[33mb0d3604[m Reacting in UI to pulsing events
+[33m349530c[m reafactoring
+[33mbc4ea49[m Adding pulsing functionality
+[33m98de71b[m Setting up the ground for periodic changes in device state
+[33m5427150[m Merge branch 'master' of https://github.com/IulianCaluian/io-device-emulator
+[33mbcfb698[m Adding API support for di-counter and relay-pulse
+[33m5b54d38[m Update README.md
+[33mbd00fe8[m Create README.md
+[33ma9a840b[m Adding new svgs
+[33m9630501[m Update main.yml
+[33m3e81132[m Update main.yml
+[33m2790670[m Update main.yml
+[33mb43106d[m Update main.yml
+[33mb119f9b[m Update main.yml
+[33m00b2f00[m Update main.yml
+[33mb0abf66[m Update main.yml
+[33m841c9d9[m Create main.yml
+[33m76c2d54[m Wire up the logic for relay wiring
+[33m8f569c0[m Creating the UI for wiring
+[33m9dc6c32[m Clean up
+[33mb45340c[m Adding JS interop support for barrier animation
+[33mb38d96b[m Changing UI
+[33m56fe6a2[m Solving gRCP closing issue
+[33m7c94cb8[m Add GET relay functionality in API
+[33m3b405e3[m Adding change relay status api-sim functionality
+[33m61d1820[m Move barrier UI in device simulator
+[33mfcf8965[m Add tests for barrier-model
+[33m9460de9[m Adding logic for barrier model
+[33m374207f[m Adding input terminals in barrier VM
+[33m1bcad62[m Refactoring barrier move in a VM
+[33m6175349[m Adding a testing project
+[33m64e43aa[m Adding a barrier class
+[33md3d49c4[m Adding a graphical barrier ui
+[33mca2b01a[m Set digital input status from UI
+[33m2caf83d[m Clean up old fetch data methods
+[33m576c0cd[m Get ioEvents through gRPC stream service
+[33m7faa213[m Get device state through gRPC service
+[33m51d12cb[m di and relays ui
+[33m4ed77a9[m Adding API functions for digital inputs
+[33m4e19ba1[m Observe when Get is called in Controller and send a message on gRPC stream
+[33m0e83501[m Add reading of server grpc streaming in blazor client
+[33m7f494f1[m Add a gRPC stream method
+[33md68f937[m Compliting grcp weather forcast
+[33me79af60[m Include protoweatherforcast.proto
+[33m2067cec[m Adding a hosted WASM app
+[33mbff6f16[m Initial commit
